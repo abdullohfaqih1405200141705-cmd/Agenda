@@ -22,7 +22,7 @@ small,.mu{color:var(--mu);font-size:12px}small{display:block}
 .nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
 .nav button{flex:1;padding:10px 0;font-weight:600;color:var(--mu)}.nav button[aria-selected=true]{color:var(--g);box-shadow:inset 0 3px var(--am)}
 .dn{display:flex;align-items:center;gap:6px}.dn h2{flex:1;margin:0;font-size:16px;text-align:center}
-#ydate{width:44px;margin:0;padding:6px;color:transparent;border:1px solid var(--bd);border-radius:10px;background:var(--cd)}
+#ydate{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0}
 .ib{width:38px;height:38px;border-radius:12px;background:var(--gs);color:var(--g);font-weight:700}
 .pill{padding:6px 12px;border-radius:99px;background:var(--gs);color:var(--g);font-weight:600;white-space:nowrap;font-size:13px}.pill.on{background:var(--g);color:var(--bg)}
 .sc{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px}
@@ -58,33 +58,23 @@ fieldset{border:1px solid var(--bd);border-radius:12px;margin:12px 0 0}.g3{displ
 .meta{margin:10px 0 0}.meta div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--bd);font-size:13px}.meta dd{margin:0;text-align:right;font-weight:600}
 #toasts{position:fixed;left:12px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));display:grid;gap:6px;z-index:30;pointer-events:none}
 .toast{background:var(--gd);color:#fff;padding:10px 14px;border-radius:12px;pointer-events:auto;display:flex;justify-content:space-between;gap:10px;align-items:center}.toast button{color:var(--am);font-weight:700}
-.top{display:block;padding:12px 16px 20px;border-radius:0 0 26px 26px;background:radial-gradient(circle at 92% 0,#f5b73c40 0 80px,transparent 81px),repeating-conic-gradient(from 0deg at 50% 130%,#ffffff12 0 8deg,transparent 8deg 16deg),linear-gradient(135deg,var(--gd),#0b6b4f)}
+.top{display:block;padding:12px 16px 14px;border-radius:0 0 20px 20px}
 .tr{display:flex;justify-content:space-between;align-items:center;font-size:18px}
-.hk{margin:8px 0 0;font-size:13px;font-weight:500;line-height:1.5;color:#d8efe5}
-#app{padding-top:16px}
-.card,.card2{box-shadow:0 2px 10px #0b6b4f14;border-radius:18px}
+.hk{margin:6px 0 0;font-size:12.5px;line-height:1.5;color:#cfe8dd;font-weight:400}
+#app{padding-top:14px}
 .kpi{display:flex;align-items:center;gap:14px}
-.ring{--p:0;flex:none;width:92px;height:92px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--am) calc(var(--p)*1%),var(--bd) 0)}
-.ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--cd)}
-.ring span{position:relative;font-size:24px;font-weight:800;color:var(--g)}
-.kpi.gold{border-color:var(--am);background:linear-gradient(135deg,color-mix(in srgb,var(--am) 22%,var(--cd)),var(--cd))}
-.slot{border-top:4px solid var(--cc);background:linear-gradient(180deg,color-mix(in srgb,var(--cc) 9%,var(--cd)),var(--cd) 80px)}
-.row{border-left:3px solid var(--cc,transparent);padding-left:8px}
-.cat{background:color-mix(in srgb,var(--cc,var(--g)) 16%,var(--cd));color:color-mix(in srgb,var(--cc,var(--g)) 75%,var(--tx))}
-.pill.cf{background:color-mix(in srgb,var(--cc) 16%,var(--cd));color:color-mix(in srgb,var(--cc) 75%,var(--tx))}
-.pill.cf.on{background:var(--cc);color:#fff}
-.day.on{background:linear-gradient(135deg,var(--gd),#0b6b4f);box-shadow:0 3px 0 var(--am)}
-.hero{background:radial-gradient(circle at 100% 0,color-mix(in srgb,var(--ac) 26%,transparent) 0 90px,transparent 91px),color-mix(in srgb,var(--ac) 9%,var(--cd))}
-.fab{background:linear-gradient(135deg,#f5b73c,#e08a00)}
-.nav button[aria-selected=true]{background:var(--gs)}
+.ring{--p:0;flex:none;width:80px;height:80px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--g) calc(var(--p)*1%),var(--bd) 0)}
+.ring::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--cd)}
+.ring span{position:relative;font-size:20px;font-weight:800;color:var(--g)}
+.slot-h{cursor:pointer}.row .ic{opacity:.55}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<header class="top"><div class="tr"><span>☪ YaumiyahQu</span><button data-go="menu" aria-label="Cadangan data">⋯</button></div><p id="hk" class="hk"></p></header>
+<header class="top"><div class="tr"><span>☪ YaumiyahQu</span></div><p id="hk" class="hk"></p></header>
 <main id="app">
 <div id="ty">
- <div class="dn"><button class="ib" data-go="prev" aria-label="Hari sebelumnya">◀</button><h2 id="yt"></h2><button class="ib" data-go="next" aria-label="Hari berikutnya">▶</button><input id="ydate" type="date" aria-label="Pilih tanggal"></div>
+ <div class="dn"><button class="ib" data-go="prev" aria-label="Hari sebelumnya">◀</button><h2 id="yt"></h2><button class="ib" data-go="next" aria-label="Hari berikutnya">▶</button><label class="ib" style="margin:0;position:relative;display:grid;place-items:center">📅<input id="ydate" type="date" aria-label="Pilih tanggal"></label></div>
  <div class="sc" style="margin-top:10px"><button class="pill on" id="vj" data-go="yv|yj">📝 Jurnal</button><button class="pill" id="vr" data-go="yv|yr">📊 Rekap</button><button class="pill" data-go="today">Hari ini</button></div>
  <div id="yj">
   <div class="card kpi" id="kcard"><div class="ring" id="kr"><span id="kp">0%</span></div><div style="flex:1"><b id="kl"></b><small id="kc"></small><button class="pill" data-go="reset" style="margin-top:8px">Ulangi hari ini</button></div></div>
@@ -119,8 +109,7 @@ const $=s=>document.querySelector(s),KEY='yaumiyahqu_app_v1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const p2=n=>String(Math.max(0,Math.floor(n))).padStart(2,'0'),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const DAYS=['Ahad','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'],MON=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-const CATS=[['Adminda','📋'],['Ubudiyah','🕌'],['Taklimiyah','📖'],['PSD','👥'],['Kapok','📌'],['Kesehatan','🌿'],['Wakepda','🏛️'],['Kada','⭐'],['Pribadi','🏠']],CI=Object.fromEntries(CATS),CC={Adminda:'#6d5acd',Ubudiyah:'#0b8f6a',Taklimiyah:'#2563eb',PSD:'#c2410c',Kapok:'#b7791f',Kesehatan:'#16a34a',Wakepda:'#9333ea',Kada:'#db2777',Pribadi:'#0e7490'};
-const tc=t=>{const h=parseInt(t,10);return h<6?['🌌','#4f46e5']:h<10?['🌅','#d97706']:h<15?['☀️','#ea580c']:h<18?['🌤️','#0891b2']:['🌙','#7c3aed']};
+const CATS=[['Adminda','📋'],['Ubudiyah','🕌'],['Taklimiyah','📖'],['PSD','👥'],['Kapok','📌'],['Kesehatan','🌿'],['Wakepda','🏛️'],['Kada','⭐'],['Pribadi','🏠']],CI=Object.fromEntries(CATS);
 const SL=[['04:00','06:00','Subuh, dzikir & tilawah'],['06:00','08:00','Pagi & Dhuha'],['08:00','12:00','Kegiatan pagi–siang'],['12:00','15:30','Dzuhur & siang'],['15:30','18:00','Ashar & dzikir sore'],['18:00','21:30','Maghrib, Isya & taklimiyah']];
 const AC=[
 ['Tahajud, Subuh berjamaah & dzikir pagi|Ubudiyah','Olahraga pagi|Kesehatan','Rencana program pekan ini|Kada','Dzuhur & silaturahmi keluarga|Pribadi','Siapkan berkas mingguan|Adminda','Kajian malam & murojaah|Taklimiyah'],
@@ -167,15 +156,15 @@ function stats(ds){const e=eff(ds),ck=Y.chk[ds]||{},n=e.acts.length,dn=e.acts.fi
  e.slots.forEach(s=>{const l=e.acts.filter(a=>a.sl===s.id);if(l.length){sa++;if(l.every(a=>ck[a.id]))sd++}});
  return{n,dn,pct:n?Math.round(dn/n*100):0,sa,sd,cy:e.acts.filter(a=>a.carry&&!ck[a.id]).length}}
 function rY(){const ds=Y.date,d=dow(ds),st=stats(ds),e=eff(ds),ck=Y.chk[ds]||{};
- $('#ydate').value=ds;$('#yt').textContent=fmtD(ds);$('#kp').textContent=st.pct+'%';$('#kr').style.setProperty('--p',st.pct);$('#kcard').classList.toggle('gold',st.pct>=85);
+ $('#ydate').value=ds;$('#yt').textContent=fmtD(ds);$('#kp').textContent=st.pct+'%';$('#kr').style.setProperty('--p',st.pct);
  $('#kl').textContent=st.pct>=85?'Mumtaz (sangat baik)':st.pct>=65?'Jayyid (baik)':'Semangat, terus istiqamah';
  $('#kc').textContent=`${st.dn}/${st.n} kegiatan · ${st.sd}/${st.sa} jam tuntas · ${st.cy} tugas menunggu`;
  $('#dt').innerHTML=DAYS.map((n,i)=>{const s=stats(addD(ds,i-d));return`<button class="day${i===d?' on':''}" data-go="day|${i}"><b>${n}</b><br>${s.pct}%</button>`}).join('');
- $('#cf').innerHTML=['ALL',...CATS.map(c=>c[0])].map(c=>`<button class="pill${c===cat?' on':''}${CC[c]?' cf':''}" ${CC[c]?`style="--cc:${CC[c]}" `:''}data-go="cat|${c}">${c==='ALL'?'Semua':CI[c]+' '+c}</button>`).join('');
+ $('#cf').innerHTML=['ALL',...CATS.map(c=>c[0])].map(c=>`<button class="pill${c===cat?' on':''}" data-go="cat|${c}">${c==='ALL'?'Semua':CI[c]+' '+c}</button>`).join('');
  const show=e.acts.filter(a=>cat==='ALL'||(a.c===cat&&!ck[a.id]));
- const row=a=>{const dn=!!ck[a.id];return`<div class="row${dn?' ok':''}" style="--cc:${CC[a.c]||'#0e7490'}"><label><input type="checkbox" class="chk" data-ck="${esc(a.id)}"${dn?' checked':''}><span>${esc(a.t)}<small><i class="cat">${CI[a.c]||'🏠'} ${esc(a.c)}</i>${a.carry?'<i class="cat rp">🔄 Sampai selesai</i>':''}</small></span></label><span><button class="ic" data-go="ea|${esc(a.id)}" aria-label="Ubah kegiatan">✏️</button><button class="ic" data-go="da|${esc(a.id)}" aria-label="Hapus kegiatan">🗑️</button></span></div>`};
+ const row=a=>{const dn=!!ck[a.id];return`<div class="row${dn?' ok':''}"><label><input type="checkbox" class="chk" data-ck="${esc(a.id)}"${dn?' checked':''}><span>${esc(a.t)}<small><i class="cat">${CI[a.c]||'🏠'} ${esc(a.c)}</i>${a.carry?'<i class="cat rp">🔄 Sampai selesai</i>':''}</small></span></label><span><button class="ic" data-go="ea|${esc(a.id)}" aria-label="Ubah kegiatan">✏️</button><button class="ic" data-go="da|${esc(a.id)}" aria-label="Hapus kegiatan">🗑️</button></span></div>`};
  const html=e.slots.map(s=>{const all=e.acts.filter(a=>a.sl===s.id),dn=all.filter(a=>ck[a.id]).length,l=show.filter(a=>a.sl===s.id);if(cat!=='ALL'&&!l.length)return'';
-  return`<section class="card slot" style="--cc:${tc(s.s)[1]}"><div class="sh2"><div><b>${tc(s.s)[0]} ${esc(s.s)}–${esc(s.e)}</b> ${esc(s.l)}<small>${dn}/${all.length} selesai</small></div><span><button class="ic" data-go="es|${esc(s.id)}" aria-label="Ubah jam">✏️</button><button class="ic" data-go="ds|${esc(s.id)}" aria-label="Hapus jam">🗑️</button></span></div>${l.map(row).join('')||'<p class="em">Belum ada kegiatan. Bismillah, tambahkan satu.</p>'}<button class="add" data-go="as|${esc(s.id)}">+ Kegiatan di jam ini</button></section>`}).join('');
+  return`<section class="card"><div class="sh2 slot-h" data-go="es|${esc(s.id)}" role="button" tabindex="0" aria-label="Ubah jam ${esc(s.s)}"><div><b>${esc(s.s)}–${esc(s.e)}</b> ${esc(s.l)}<small>${dn}/${all.length} selesai · ketuk untuk ubah</small></div></div>${l.map(row).join('')||'<p class="em">Belum ada kegiatan. Bismillah, tambahkan satu.</p>'}<button class="add" data-go="as|${esc(s.id)}">+ Kegiatan di jam ini</button></section>`}).join('');
  $('#sl').innerHTML=html||`<p class="em">Alhamdulillah, semua kegiatan ${esc(cat)} sudah selesai.</p>`;
  if(!$('#yr').hidden)rR()}
 function rR(){const ds=Y.date,ck=Y.chk[ds]||{},e=eff(ds);
@@ -183,8 +172,8 @@ function rR(){const ds=Y.date,ck=Y.chk[ds]||{},e=eff(ds);
  $('#cp').innerHTML=CATS.map(([c,ic])=>{const a=e.acts.filter(x=>x.c===c),dn=a.filter(x=>ck[x.id]).length,p=a.length?Math.round(dn/a.length*100):0;return`<div style="margin-top:8px"><div class="dn"><span style="flex:1">${ic} ${c}</span><small>${dn}/${a.length} (${p}%)</small></div><div class="pb"><i style="width:${p}%"></i></div></div>`}).join('');
  const t=ymd(new Date());$('#hs').innerHTML=Array.from({length:10},(_,i)=>{const x=addD(t,-i),s=stats(x);return`<tr><td>${esc(fmtD(x))}</td><td>${s.dn}/${s.n}</td><td><b>${s.pct}%</b></td><td><button class="pill" data-go="jump|${x}">Buka</button></td></tr>`}).join('')}
 function slotForm(id){const sc=day(dow(Y.date)),s=id&&sc.slots.find(x=>x.id===id);if(id&&!s)return;
- const b=sheet(s?'Ubah Jam':'Tambah Jam',`<form id="f"><div class="g3" style="grid-template-columns:1fr 1fr"><label>Mulai<input name="s" type="time" required></label><label>Selesai<input name="e" type="time" required></label></div><label>Nama sesi<input name="l" required maxlength="60" placeholder="Contoh: Subuh & pagi"></label><button class="pri">Simpan</button></form>`),f=b.querySelector('#f');
- f.s.value=s?s.s:'04:30';f.e.value=s?s.e:'06:00';f.l.value=s?s.l:'';
+ const b=sheet(s?'Ubah Jam':'Tambah Jam',`<form id="f"><div class="g3" style="grid-template-columns:1fr 1fr"><label>Mulai<input name="s" type="time" required></label><label>Selesai<input name="e" type="time" required></label></div><label>Nama sesi<input name="l" required maxlength="60" placeholder="Contoh: Subuh & pagi"></label><button class="pri">Simpan</button>${s?'<button type="button" class="sec dng" id="sd" style="width:100%;margin-top:8px">Hapus jam ini</button>':''}</form>`),f=b.querySelector('#f');
+ f.s.value=s?s.s:'04:30';f.e.value=s?s.e:'06:00';f.l.value=s?s.l:'';if(s)f.querySelector('#sd').onclick=()=>{closeSheet();GO.ds(s.id)};
  f.onsubmit=ev=>{ev.preventDefault();const v={s:f.s.value,e:f.e.value,l:f.l.value.trim()};if(!v.l)return;if(s)Object.assign(s,v);else sc.slots.push({id:'s'+uid(),...v});save();closeSheet();rY()}}
 function actForm(id,pre){const e=eff(Y.date),a=id&&e.acts.find(x=>x.id===id);if(id&&!a)return;if(!e.slots.length){toast('Tambahkan jam dulu, ya.');return slotForm()}
  const b=sheet(a?'Ubah Kegiatan':'Tambah Kegiatan',`<form id="f"><label>Jam<select name="sl">${e.slots.map(s=>`<option value="${esc(s.id)}">${esc(s.s)}–${esc(s.e)} ${esc(s.l)}</option>`).join('')}</select></label><label>Nama kegiatan<input name="t" required maxlength="120" placeholder="Contoh: Shalat Dhuha"></label><label>Kategori<select name="c">${CATS.map(c=>`<option value="${c[0]}">${c[1]} ${c[0]}</option>`).join('')}</select></label><fieldset><label class="rd"><input type="radio" name="k" value="0" checked><span>Hanya di hari ini (berulang tiap pekan)</span></label><label class="rd"><input type="radio" name="k" value="1"><span>Tetap muncul sampai selesai. Setelah dicentang, tidak muncul lagi.</span></label></fieldset><button class="pri">Simpan</button></form>`),f=b.querySelector('#f');
@@ -225,9 +214,9 @@ function setDg(p,st){['d','h','m','s'].forEach(k=>{const e=$(`#${p}-${k}`),v=p2(
 function paintHero(now){const it=heroItem(),H=$('#hero');
  if(!it){$('#hb').textContent='Belum ada acara';$('#hn').textContent='Tambahkan acara pertama';$('#hh').textContent='';$('#hm').textContent='';$('#hdesc').textContent='Ketuk tombol + di kanan bawah. Bismillah.';setDg('g',{d:0,h:0,m:0,s:0});$('#hp').style.width='0%';$('#hpt').textContent='';return}
  const st=calc(it,now),[k]=prof(it,st),t=new Date(it.target);H.style.setProperty('--ac',TH[k][1]);
- $('#hb').textContent=st.x?'⏰ Waktu telah tiba':(C.auto?'🔝 Paling dekat':'📌 Dipilih');$('#hn').textContent=it.name;$('#hh').textContent='🌙 '+hLab(t,true);$('#hm').textContent='📅 '+mLab(t);
+ $('#hb').textContent=st.x?'⏰ Waktu telah tiba':(C.auto?'Paling dekat':'Dipilih');$('#hn').textContent=it.name;$('#hh').textContent='🌙 '+hLab(t,true);$('#hm').textContent='📅 '+mLab(t);
  $('#hdesc').textContent=it.desc||'Ketuk untuk melihat rincian dan menambah catatan.';setDg('g',st);$('#hp').style.width=st.pct+'%';$('#hpt').textContent=st.x?'Alhamdulillah, acara telah tiba.':`Sisa waktu ${st.pct.toFixed(1)}%`}
-function rList(){const n=Date.now();sig=C.list.map(i=>i.id+(i.done?1:0)).join();$('#cn').textContent=C.list.length;$('#au').textContent=C.auto?'🔝 Otomatis terdekat':'📌 Manual';
+function rList(){const n=Date.now();sig=C.list.map(i=>i.id+(i.done?1:0)).join();$('#cn').textContent=C.list.length;$('#au').textContent=C.auto?'Otomatis terdekat':'Manual';
  $('#cl').innerHTML=C.list.length?C.list.map(it=>{const st=calc(it,n),[k]=prof(it,st);return`<div class="card tc" data-go="cdd|${esc(it.id)}" style="border-left:5px solid ${TH[k][1]}"><div><b>${esc(it.name)}</b><div data-r="${esc(it.id)}" style="color:${TH[k][1]};font-weight:700"></div><small>🌙 ${esc(hLab(new Date(it.target),false))}</small></div><button class="ic" data-go="cdx|${esc(it.id)}" aria-label="Hapus ${esc(it.name)}">🗑️</button></div>`}).join(''):'<p class="em">Belum ada acara. Bismillah, tekan tombol + untuk menambah.</p>';paintList(n)}
 function paintList(n){C.list.forEach(it=>{const e=document.querySelector(`[data-r="${CSS.escape(it.id)}"]`);if(!e)return;const s=calc(it,n),v=s.x?'⏰ Waktu telah tiba':`${p2(s.d)}h : ${p2(s.h)}j : ${p2(s.m)}m : ${p2(s.s)}d`;if(e.textContent!==v)e.textContent=v})}
 function rCD(){ensure();rList();paintHero(Date.now())}
@@ -265,12 +254,6 @@ function paintDetail(n){const it=C.list.find(x=>x.id===curD);if(!it||!$('#q-g'))
  $('#q-p').style.width=st.pct+'%';$('#q-pt').textContent=`Sisa waktu ${st.pct.toFixed(1)}%`;$('#q-b').textContent=st.x?'⏰ Waktu telah tiba':'⚡ Timer aktif';$('#q-u').textContent=TH[k][0];$('#q-un').textContent=note;$('#q-t1').textContent=st.x?'0 jam':Math.floor(st.df/36e5)+' jam'}
 const delCD=id=>undoable('Acara dihapus.',()=>{C.list=C.list.filter(i=>i.id!==id);ensure()});
 
-/* ---------- Cadangan ---------- */
-function backup(){const b=sheet('Cadangan Data',`<p class="mu">Salin teks di bawah dan simpan di catatan atau WhatsApp. Untuk memulihkan, tempel teks cadangan lalu tekan Pulihkan.</p><textarea id="bk" style="min-height:140px;font-size:12px"></textarea><div class="act"><button class="sec" id="b-c">📋 Salin</button><button class="sec" id="b-r">♻️ Pulihkan</button></div><div class="err" id="er"></div>`);
- const ta=b.querySelector('#bk');ta.value=JSON.stringify(DB);
- b.querySelector('#b-c').onclick=async()=>{ta.select();try{await navigator.clipboard.writeText(ta.value);toast('Cadangan disalin. Jazakallahu khairan.')}catch(e){console.warn(e);toast('Teks sudah dipilih. Tekan lama lalu Salin.')}};
- b.querySelector('#b-r').onclick=()=>{try{const nd=clean(JSON.parse(ta.value));undoable('Data dipulihkan.',()=>{DB=nd;bind();Y.last=ymd(new Date());setTab(DB.tab)});closeSheet()}catch(e){b.querySelector('#er').textContent='Teks cadangan tidak valid: '+e.message}}}
-
 /* ---------- Navigasi ---------- */
 function setTab(t){DB.tab=t;$('#ty').hidden=t!=='y';$('#tc').hidden=t!=='c';$('#n-y').setAttribute('aria-selected',t==='y');$('#n-c').setAttribute('aria-selected',t==='c');$('#fab').setAttribute('aria-label',t==='y'?'Tambah kegiatan':'Tambah acara');save();rAll()}
 function rAll(){Y=DB.yq;C=DB.cd;rY();rCD()}
@@ -283,7 +266,7 @@ const GO={
  ds:id=>undoable('Jam dihapus.',()=>{const s=day(dow(Y.date));s.slots=s.slots.filter(x=>x.id!==id);s.acts=s.acts.filter(x=>x.sl!==id)}),
  da:id=>undoable('Kegiatan dihapus.',()=>{if(Y.carry.some(x=>x.id===id))Y.carry=Y.carry.filter(x=>x.id!==id);else{const s=day(dow(Y.date));s.acts=s.acts.filter(x=>x.id!==id)}}),
  fab:()=>DB.tab==='y'?actForm():cdForm(),hero:()=>{const it=heroItem();if(it)detail(it.id)},cdd:id=>detail(id),cdx:id=>delCD(id),
- auto:()=>{C.auto=!C.auto;ensure();save();rCD();toast(C.auto?'Acara paling dekat selalu di atas.':'Mode manual: ketuk acara lalu “Jadikan utama”.')},menu:backup};
+ auto:()=>{C.auto=!C.auto;ensure();save();rCD();toast(C.auto?'Acara paling dekat selalu di atas.':'Mode manual: ketuk acara lalu “Jadikan utama”.')}};
 document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(el){e.stopPropagation();const[n,...r]=el.dataset.go.split('|');if(GO[n])GO[n](r.join('|'));return}
  if(e.target.id==='sheet'||e.target.closest('[data-close]'))closeSheet()});
 document.addEventListener('change',e=>{const k=e.target.dataset.ck;
