@@ -1,0 +1,6 @@
+{
+  "appId": "id.yaumiyahqu.app",
+  "appName": "YaumiyahQu",
+  "webDir": "www",
+  "android": { "allowMixedContent": false }
+}

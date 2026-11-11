@@ -1,0 +1,16 @@
+{
+  "name": "yaumiyahqu",
+  "version": "1.0.0",
+  "private": true,
+  "description": "YaumiyahQu: jurnal harian Islami dan hitung mundur Hijriah",
+  "scripts": {
+    "build": "node -e \"const f=require('fs');f.mkdirSync('www',{recursive:true});f.copyFileSync('src/index.html','www/index.html')\""
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}
