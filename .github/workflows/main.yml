@@ -37,14 +37,15 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Tambah izin Android (getar)
+      - name: Tambah izin Android (getar, mikrofon, layanan suara)
         run: |
           python3 - <<'PY'
           p='android/app/src/main/AndroidManifest.xml'
           s=open(p).read()
           assert '<application' in s
-          perm='    <uses-permission android:name="android.permission.VIBRATE" />\n'
-          open(p,'w').write(s.replace('<application',perm+'    <application',1))
+          perm=''.join('    <uses-permission android:name="android.permission.%s" />\n'%n for n in ['VIBRATE','RECORD_AUDIO'])
+          q='    <queries>\n        <intent>\n            <action android:name="android.speech.RecognitionService" />\n        </intent>\n    </queries>\n'
+          open(p,'w').write(s.replace('<application',perm+q+'    <application',1))
           PY
 
       - name: Pasang widget layar utama (kode native)
