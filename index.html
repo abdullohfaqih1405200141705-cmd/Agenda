@@ -69,6 +69,26 @@ fieldset{border:1px solid var(--bd);border-radius:12px;margin:12px 0 0}.g3{displ
 .slot-h{cursor:pointer}.row .ic{opacity:.55}
 .ar{font-family:"Noto Naskh Arabic","Amiri","Traditional Arabic",serif;font-size:21px;line-height:2;direction:rtl;text-align:right}.hk .ar{color:#fff}summary{cursor:pointer}
 body{font-size:14px}.card,.card2{padding:10px;margin-bottom:10px}.big{font-size:28px}.ring{width:72px;height:72px}.ring::before{inset:7px}.ring span{font-size:18px}.pill{font-size:12.5px;padding:5px 11px}.dn h2{font-size:15px}.dg b{font-size:26px}.ar{font-size:20px}.ib{width:36px;height:36px}.row{padding:6px 0 6px 8px}.day{min-width:58px;padding:5px}
+/* Tampilan ringkas untuk layar Android */
+body{font-size:13px;line-height:1.35}
+#app{padding:10px 10px 88px}
+.top{padding:9px 14px 11px}.tr{font-size:16px}.hk{font-size:12px;line-height:1.4}.ar{font-size:18px;line-height:1.9}
+.card,.card2{padding:8px 10px;margin-bottom:8px;border-radius:14px}
+.dn h2{font-size:14px}.ib{width:32px;height:32px;border-radius:10px;font-size:12px}
+.pill{font-size:12px;padding:4px 10px}.sc{gap:5px;padding-bottom:8px}
+.day{min-width:50px;padding:4px;font-size:11px;border-radius:10px}
+.big{font-size:24px}.ring{width:58px;height:58px}.ring::before{inset:6px}.ring span{font-size:15px}.kpi{gap:12px}
+.sh2{margin-bottom:2px;font-size:13px}.sh2 small{font-size:11px}
+.row{padding:4px 0 4px 6px;gap:2px}.row label{gap:8px;font-size:13px}
+.chk{width:20px;height:20px;border-radius:6px}.chk:checked::before{font-size:13px}
+.row label small{display:inline;margin-left:5px}
+.cat{font-size:10px;padding:0 6px;margin:0 3px 0 0}
+.ic{width:28px;height:28px;font-size:12px}
+.add{padding:5px;font-size:12px;margin-top:4px;border-radius:8px}
+.em{font-size:12px;margin:2px 0}
+.sec{padding:8px;font-size:13px}
+.nav button{padding:8px 0;font-size:13px}
+.fab{width:48px;height:48px;font-size:26px;bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -317,10 +337,10 @@ const WB=()=>{try{return window.Capacitor&&Capacitor.isNativePlatform()?(Capacit
 var wgT=null;
 function wgQ(){if(!WB())return;clearTimeout(wgT);wgT=setTimeout(wgPush,800)}
 async function wgPull(){const W=WB();if(!W)return;try{const r=await W.takePending();let ch=false;
- String(r.items||'').split(';').filter(Boolean).forEach(x=>{const[d,id]=x.split('|');if(DRE.test(d)&&id){(Y.chk[d]=Y.chk[d]||{})[id]=1;ch=true}});if(ch){save();rY()}}catch(e){console.warn(e)}}
-async function wgPush(){const W=WB();if(!W)return;try{const ds=ymd(new Date()),e=eff(ds),ck=Y.chk[ds]||{},st=stats(ds),it=C.list.find(i=>+new Date(i.target)>Date.now()),sOf=a=>(e.slots.find(s=>s.id===a.sl)||{s:''}).s;
- const d={d:ds,n:st.n,dn:st.dn,tk:e.acts.filter(a=>!ck[a.id]).sort((p,q)=>sOf(p).localeCompare(sOf(q))).slice(0,6).map(a=>({id:a.id,t:a.t.slice(0,40)}))};
- if(it){d.ts=+new Date(it.target);d.en=it.name.slice(0,30)}await W.set({json:JSON.stringify(d)})}catch(x){console.warn(x)}}
+ String(r.items||'').split(';').filter(Boolean).forEach(x=>{const[d,id,v]=x.split('|');if(DRE.test(d)&&id){const m=Y.chk[d]=Y.chk[d]||{};if(v==='0')delete m[id];else m[id]=1;ch=true}});if(ch){save();rY()}}catch(e){console.warn(e)}}
+async function wgPush(){const W=WB();if(!W)return;try{const ds=ymd(new Date()),e=eff(ds),ck=Y.chk[ds]||{},st=stats(ds),now=Date.now(),up=C.list.filter(i=>+new Date(i.target)>now),sOf=a=>(e.slots.find(s=>s.id===a.sl)||{s:''}).s;
+ const d={d:ds,n:st.n,dn:st.dn,tk:e.acts.map(a=>({id:a.id,h:sOf(a),t:a.t.slice(0,60),x:ck[a.id]?1:0})).sort((p,q)=>p.h.localeCompare(q.h)),evs:up.slice(0,20).map(i=>({n:i.name.slice(0,40),ts:+new Date(i.target)}))};
+ if(up[0]){d.ts=+new Date(up[0].target);d.en=up[0].name.slice(0,30)}await W.set({json:JSON.stringify(d)})}catch(x){console.warn(x)}}
 
 /* ---------- Sinkronisasi cloud (Supabase, offline-first) ---------- */
 const SB={url:'https://jeduzsituiexxcyadcgk.supabase.co',key:'sb_publishable_EFJikLoLHKOmFlPcd1v1Gg_rnZffKfG'};
