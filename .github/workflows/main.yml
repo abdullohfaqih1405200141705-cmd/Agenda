@@ -91,6 +91,7 @@ jobs:
                   Context c = getContext();
                   c.getSharedPreferences(WidgetProvider.PREFS, Context.MODE_PRIVATE).edit().putString("data", json).apply();
                   WidgetProvider.refreshAll(c);
+                  CountdownProvider.refreshAll(c);
                   call.resolve();
               }
 
@@ -116,7 +117,6 @@ jobs:
           import android.content.Intent;
           import android.content.SharedPreferences;
           import android.net.Uri;
-          import android.view.View;
           import android.widget.RemoteViews;
           import java.text.SimpleDateFormat;
           import java.util.Calendar;
@@ -125,11 +125,12 @@ jobs:
           import org.json.JSONArray;
           import org.json.JSONObject;
 
+          /** Widget "Kegiatan": hitung mundur terdekat, capaian, dan daftar kegiatan hari ini (bergulir). */
           public class WidgetProvider extends AppWidgetProvider {
               static final String PREFS = "yq_widget";
               static final String ACT_TOGGLE = "id.yaumiyahqu.app.TOGGLE";
-              private static final int[] ROWS = {R.id.t1, R.id.t2, R.id.t3};
-              private static final int FLAGS = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+              static final int FLAGS = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+              static final int FLAGS_MUTABLE = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE;
 
               @Override
               public void onUpdate(Context c, AppWidgetManager m, int[] ids) {
@@ -151,34 +152,34 @@ jobs:
                   for (int id : m.getAppWidgetIds(new ComponentName(c, WidgetProvider.class))) render(c, m, id);
               }
 
+              /** Ketuk baris: centang bila belum, batalkan centang bila sudah. Dicatat agar aplikasi menyusul. */
               private static void toggle(Context c, String taskId) {
                   if (taskId == null) return;
                   SharedPreferences p = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
                   try {
                       JSONObject d = new JSONObject(p.getString("data", "{}"));
                       JSONArray tk = d.optJSONArray("tk");
-                      boolean hit = false;
-                      if (tk != null) {
-                          for (int i = 0; i < tk.length(); i++) {
-                              JSONObject o = tk.getJSONObject(i);
-                              if (taskId.equals(o.optString("id")) && o.optInt("x", 0) == 0) {
-                                  o.put("x", 1);
-                                  hit = true;
-                              }
+                      if (tk == null) return;
+                      int now = -1;
+                      for (int i = 0; i < tk.length(); i++) {
+                          JSONObject o = tk.getJSONObject(i);
+                          if (taskId.equals(o.optString("id"))) {
+                              now = o.optInt("x", 0) == 0 ? 1 : 0;
+                              o.put("x", now);
                           }
                       }
-                      if (!hit) return;
-                      d.put("dn", d.optInt("dn", 0) + 1);
+                      if (now < 0) return;
+                      d.put("dn", Math.max(0, d.optInt("dn", 0) + (now == 1 ? 1 : -1)));
                       p.edit()
                           .putString("data", d.toString())
-                          .putString("pending", p.getString("pending", "") + d.optString("d") + "|" + taskId + ";")
+                          .putString("pending", p.getString("pending", "") + d.optString("d") + "|" + taskId + "|" + now + ";")
                           .apply();
                   } catch (Exception e) {
                       // Data rusak: diabaikan, aplikasi akan menulis ulang saat dibuka.
                   }
               }
 
-              private static long dayStart(long t) {
+              static long dayStart(long t) {
                   Calendar k = Calendar.getInstance();
                   k.setTimeInMillis(t);
                   k.set(Calendar.HOUR_OF_DAY, 0);
@@ -196,8 +197,6 @@ jobs:
                   String ev = "Belum ada acara";
                   String msg = "Buka aplikasi untuk memulai.";
                   int pct = 0;
-                  boolean fresh = false;
-                  JSONArray tk = null;
                   try {
                       String raw = p.getString("data", null);
                       if (raw != null) {
@@ -213,10 +212,8 @@ jobs:
                           int n = d.optInt("n", 0);
                           int dn = d.optInt("dn", 0);
                           pct = n > 0 ? Math.min(100, dn * 100 / n) : 0;
-                          fresh = today.equals(d.optString("d"));
-                          tk = d.optJSONArray("tk");
-                          msg = fresh ? "Alhamdulillah, semua kegiatan hari ini selesai."
-                                      : "Buka aplikasi untuk memuat kegiatan hari ini.";
+                          msg = today.equals(d.optString("d")) ? "Belum ada kegiatan hari ini."
+                                                                : "Buka aplikasi untuk memuat kegiatan hari ini.";
                       }
                   } catch (Exception e) {
                       msg = "Buka aplikasi untuk memuat ulang.";
@@ -225,43 +222,277 @@ jobs:
                   v.setTextViewText(R.id.ev, ev);
                   v.setTextViewText(R.id.pc, pct + "%");
                   v.setProgressBar(R.id.pb, 100, pct, false);
+                  v.setTextViewText(R.id.empty, msg);
 
                   Intent li = c.getPackageManager().getLaunchIntentForPackage(c.getPackageName());
-                  PendingIntent launch = li == null ? null : PendingIntent.getActivity(c, 1, li, FLAGS);
-                  if (launch != null) v.setOnClickPendingIntent(R.id.root, launch);
+                  if (li != null) v.setOnClickPendingIntent(R.id.root, PendingIntent.getActivity(c, 1, li, FLAGS));
 
-                  int shown = 0;
-                  if (fresh && tk != null) {
-                      try {
-                          for (int i = 0; i < tk.length() && shown < ROWS.length; i++) {
-                              JSONObject o = tk.getJSONObject(i);
-                              if (o.optInt("x", 0) == 1) continue;
-                              String id = o.optString("id");
-                              v.setTextViewText(ROWS[shown], "○  " + o.optString("t"));
-                              v.setViewVisibility(ROWS[shown], View.VISIBLE);
-                              Intent in = new Intent(c, WidgetProvider.class)
-                                  .setAction(ACT_TOGGLE)
-                                  .setData(Uri.parse("yq://task/" + Uri.encode(id)))
-                                  .putExtra("id", id);
-                              v.setOnClickPendingIntent(ROWS[shown], PendingIntent.getBroadcast(c, 0, in, FLAGS));
-                              shown++;
-                          }
-                      } catch (Exception e) {
-                          // Tampilkan baris yang sempat dimuat.
-                      }
-                  }
-                  if (shown == 0) {
-                      v.setTextViewText(ROWS[0], msg);
-                      v.setViewVisibility(ROWS[0], View.VISIBLE);
-                      if (launch != null) v.setOnClickPendingIntent(ROWS[0], launch);
-                      shown = 1;
-                  }
-                  for (int i = shown; i < ROWS.length; i++) v.setViewVisibility(ROWS[i], View.GONE);
+                  Intent si = new Intent(c, TaskService.class);
+                  si.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+                  si.setData(Uri.parse(si.toUri(Intent.URI_INTENT_SCHEME)));
+                  v.setRemoteAdapter(R.id.list, si);
+                  v.setEmptyView(R.id.list, R.id.empty);
+                  Intent tpl = new Intent(c, WidgetProvider.class).setAction(ACT_TOGGLE);
+                  v.setPendingIntentTemplate(R.id.list, PendingIntent.getBroadcast(c, 0, tpl, FLAGS_MUTABLE));
+
                   m.updateAppWidget(widgetId, v);
+                  m.notifyAppWidgetViewDataChanged(widgetId, R.id.list);
               }
           }
           END_2
-          cat > "$R/layout/widget_yaumiyah.xml" <<'END_3'
+          cat > "$J/TaskService.java" <<'END_3'
+          package id.yaumiyahqu.app;
+
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.SharedPreferences;
+          import android.widget.RemoteViews;
+          import android.widget.RemoteViewsService;
+          import java.text.SimpleDateFormat;
+          import java.util.ArrayList;
+          import java.util.Date;
+          import java.util.List;
+          import java.util.Locale;
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+
+          /** Penyedia baris daftar kegiatan hari ini (urut dari awal sampai akhir). */
+          public class TaskService extends RemoteViewsService {
+              @Override
+              public RemoteViewsFactory onGetViewFactory(Intent intent) {
+                  return new Factory(getApplicationContext());
+              }
+
+              static class Factory implements RemoteViewsService.RemoteViewsFactory {
+                  private final Context c;
+                  private final List<String[]> rows = new ArrayList<>();
+
+                  Factory(Context c) {
+                      this.c = c;
+                  }
+
+                  @Override
+                  public void onCreate() {
+                  }
+
+                  @Override
+                  public void onDataSetChanged() {
+                      rows.clear();
+                      try {
+                          SharedPreferences p = c.getSharedPreferences(WidgetProvider.PREFS, Context.MODE_PRIVATE);
+                          String raw = p.getString("data", null);
+                          if (raw == null) return;
+                          JSONObject d = new JSONObject(raw);
+                          String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+                          if (!today.equals(d.optString("d"))) return;
+                          JSONArray tk = d.optJSONArray("tk");
+                          if (tk == null) return;
+                          for (int i = 0; i < tk.length(); i++) {
+                              JSONObject o = tk.getJSONObject(i);
+                              rows.add(new String[] {
+                                  o.optString("id"), o.optString("h"), o.optString("t"), String.valueOf(o.optInt("x", 0))
+                              });
+                          }
+                      } catch (Exception e) {
+                          rows.clear();
+                      }
+                  }
+
+                  @Override
+                  public void onDestroy() {
+                      rows.clear();
+                  }
+
+                  @Override
+                  public int getCount() {
+                      return rows.size();
+                  }
+
+                  @Override
+                  public RemoteViews getViewAt(int i) {
+                      RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget_task_item);
+                      if (i < 0 || i >= rows.size()) return v;
+                      String[] r = rows.get(i);
+                      boolean done = "1".equals(r[3]);
+                      v.setTextViewText(R.id.ti, r[1]);
+                      v.setTextViewText(R.id.tt, (done ? "✓  " : "○  ") + r[2]);
+                      v.setTextColor(R.id.tt, done ? 0xFF7FA595 : 0xFFFFFFFF);
+                      v.setOnClickFillInIntent(R.id.row, new Intent().putExtra("id", r[0]));
+                      return v;
+                  }
+
+                  @Override
+                  public RemoteViews getLoadingView() {
+                      return null;
+                  }
+
+                  @Override
+                  public int getViewTypeCount() {
+                      return 1;
+                  }
+
+                  @Override
+                  public long getItemId(int i) {
+                      return i;
+                  }
+
+                  @Override
+                  public boolean hasStableIds() {
+                      return true;
+                  }
+              }
+          }
+          END_3
+          cat > "$J/CountdownProvider.java" <<'END_4'
+          package id.yaumiyahqu.app;
+
+          import android.app.PendingIntent;
+          import android.appwidget.AppWidgetManager;
+          import android.appwidget.AppWidgetProvider;
+          import android.content.ComponentName;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.net.Uri;
+          import android.widget.RemoteViews;
+
+          /** Widget "Hitung Mundur": semua acara mendatang, bergulir. Ketuk untuk membuka aplikasi. */
+          public class CountdownProvider extends AppWidgetProvider {
+              @Override
+              public void onUpdate(Context c, AppWidgetManager m, int[] ids) {
+                  for (int id : ids) render(c, m, id);
+              }
+
+              static void refreshAll(Context c) {
+                  AppWidgetManager m = AppWidgetManager.getInstance(c);
+                  for (int id : m.getAppWidgetIds(new ComponentName(c, CountdownProvider.class))) render(c, m, id);
+              }
+
+              private static void render(Context c, AppWidgetManager m, int widgetId) {
+                  RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget_countdown);
+                  v.setTextViewText(R.id.cempty, "Belum ada acara. Tambahkan di aplikasi.");
+
+                  Intent si = new Intent(c, CountdownService.class);
+                  si.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+                  si.setData(Uri.parse(si.toUri(Intent.URI_INTENT_SCHEME)));
+                  v.setRemoteAdapter(R.id.clist, si);
+                  v.setEmptyView(R.id.clist, R.id.cempty);
+
+                  Intent li = c.getPackageManager().getLaunchIntentForPackage(c.getPackageName());
+                  if (li != null) {
+                      PendingIntent open = PendingIntent.getActivity(c, 2, li, WidgetProvider.FLAGS_MUTABLE);
+                      v.setPendingIntentTemplate(R.id.clist, open);
+                      v.setOnClickPendingIntent(R.id.croot, open);
+                  }
+                  m.updateAppWidget(widgetId, v);
+                  m.notifyAppWidgetViewDataChanged(widgetId, R.id.clist);
+              }
+          }
+          END_4
+          cat > "$J/CountdownService.java" <<'END_5'
+          package id.yaumiyahqu.app;
+
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.SharedPreferences;
+          import android.widget.RemoteViews;
+          import android.widget.RemoteViewsService;
+          import java.text.SimpleDateFormat;
+          import java.util.ArrayList;
+          import java.util.Date;
+          import java.util.List;
+          import java.util.Locale;
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+
+          /** Penyedia baris daftar acara mendatang beserta sisa harinya (H-N). */
+          public class CountdownService extends RemoteViewsService {
+              @Override
+              public RemoteViewsFactory onGetViewFactory(Intent intent) {
+                  return new Factory(getApplicationContext());
+              }
+
+              static class Factory implements RemoteViewsService.RemoteViewsFactory {
+                  private final Context c;
+                  private final List<Object[]> rows = new ArrayList<>();
+                  private final SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy · HH.mm", new Locale("id", "ID"));
+
+                  Factory(Context c) {
+                      this.c = c;
+                  }
+
+                  @Override
+                  public void onCreate() {
+                  }
+
+                  @Override
+                  public void onDataSetChanged() {
+                      rows.clear();
+                      try {
+                          SharedPreferences p = c.getSharedPreferences(WidgetProvider.PREFS, Context.MODE_PRIVATE);
+                          String raw = p.getString("data", null);
+                          if (raw == null) return;
+                          JSONArray evs = new JSONObject(raw).optJSONArray("evs");
+                          if (evs == null) return;
+                          long now = System.currentTimeMillis();
+                          for (int i = 0; i < evs.length(); i++) {
+                              JSONObject o = evs.getJSONObject(i);
+                              long ts = o.getLong("ts");
+                              if (ts > now) rows.add(new Object[] {o.optString("n"), Long.valueOf(ts)});
+                          }
+                      } catch (Exception e) {
+                          rows.clear();
+                      }
+                  }
+
+                  @Override
+                  public void onDestroy() {
+                      rows.clear();
+                  }
+
+                  @Override
+                  public int getCount() {
+                      return rows.size();
+                  }
+
+                  @Override
+                  public RemoteViews getViewAt(int i) {
+                      RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget_cd_item);
+                      if (i < 0 || i >= rows.size()) return v;
+                      Object[] r = rows.get(i);
+                      long ts = ((Long) r[1]).longValue();
+                      long now = System.currentTimeMillis();
+                      long days = Math.round((WidgetProvider.dayStart(ts) - WidgetProvider.dayStart(now)) / 86400000.0);
+                      v.setTextViewText(R.id.cd, days <= 0 ? "Hari ini" : "H-" + days);
+                      v.setTextColor(R.id.cd, days <= 1 ? 0xFFFF8A80 : days <= 7 ? 0xFFF5B73C : 0xFF8BE0B8);
+                      v.setTextViewText(R.id.cn, (String) r[0]);
+                      v.setTextViewText(R.id.cm, fmt.format(new Date(ts)));
+                      v.setOnClickFillInIntent(R.id.crow, new Intent());
+                      return v;
+                  }
+
+                  @Override
+                  public RemoteViews getLoadingView() {
+                      return null;
+                  }
+
+                  @Override
+                  public int getViewTypeCount() {
+                      return 1;
+                  }
+
+                  @Override
+                  public long getItemId(int i) {
+                      return i;
+                  }
+
+                  @Override
+                  public boolean hasStableIds() {
+                      return true;
+                  }
+              }
+          }
+          END_5
+          cat > "$R/layout/widget_yaumiyah.xml" <<'END_6'
           <?xml version="1.0" encoding="utf-8"?>
           <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/root"
@@ -271,24 +502,15 @@ jobs:
               android:orientation="vertical"
               android:padding="10dp">
 
-              <LinearLayout
+              <TextView
+                  android:id="@+id/ev"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:gravity="center_vertical"
-                  android:orientation="horizontal">
-
-                  <TextView
-                      android:id="@+id/ev"
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:ellipsize="end"
-                      android:maxLines="1"
-                      android:textColor="#F5B73C"
-                      android:textSize="13sp"
-                      android:textStyle="bold" />
-
-              </LinearLayout>
+                  android:ellipsize="end"
+                  android:maxLines="1"
+                  android:textColor="#F5B73C"
+                  android:textSize="13sp"
+                  android:textStyle="bold" />
 
               <LinearLayout
                   android:layout_width="match_parent"
@@ -317,45 +539,153 @@ jobs:
                       android:textStyle="bold" />
               </LinearLayout>
 
-              <TextView
-                  android:id="@+id/t1"
+              <FrameLayout
                   android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_marginTop="6dp"
-                  android:ellipsize="end"
-                  android:maxLines="1"
-                  android:textColor="#FFFFFF"
-                  android:textSize="12sp" />
+                  android:layout_height="0dp"
+                  android:layout_marginTop="4dp"
+                  android:layout_weight="1">
+
+                  <ListView
+                      android:id="@+id/list"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:divider="@null"
+                      android:dividerHeight="0dp" />
+
+                  <TextView
+                      android:id="@+id/empty"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center_vertical"
+                      android:gravity="center"
+                      android:textColor="#CFE8DD"
+                      android:textSize="12sp" />
+              </FrameLayout>
+          </LinearLayout>
+          END_6
+          cat > "$R/layout/widget_task_item.xml" <<'END_7'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/row"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:paddingTop="4dp"
+              android:paddingBottom="4dp">
 
               <TextView
-                  android:id="@+id/t2"
-                  android:layout_width="match_parent"
+                  android:id="@+id/ti"
+                  android:layout_width="40dp"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="4dp"
-                  android:ellipsize="end"
-                  android:maxLines="1"
-                  android:textColor="#FFFFFF"
-                  android:textSize="12sp" />
+                  android:textColor="#F5B73C"
+                  android:textSize="10sp" />
 
               <TextView
-                  android:id="@+id/t3"
-                  android:layout_width="match_parent"
+                  android:id="@+id/tt"
+                  android:layout_width="0dp"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="4dp"
+                  android:layout_weight="1"
                   android:ellipsize="end"
-                  android:maxLines="1"
+                  android:maxLines="2"
                   android:textColor="#FFFFFF"
                   android:textSize="12sp" />
           </LinearLayout>
-          END_3
-          cat > "$R/drawable/widget_bg.xml" <<'END_4'
+          END_7
+          cat > "$R/layout/widget_countdown.xml" <<'END_8'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/croot"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/widget_bg"
+              android:orientation="vertical"
+              android:padding="10dp">
+
+              <TextView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:maxLines="1"
+                  android:text="⏳ Hitung Mundur"
+                  android:textColor="#F5B73C"
+                  android:textSize="13sp"
+                  android:textStyle="bold" />
+
+              <FrameLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_marginTop="4dp"
+                  android:layout_weight="1">
+
+                  <ListView
+                      android:id="@+id/clist"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:divider="@null"
+                      android:dividerHeight="0dp" />
+
+                  <TextView
+                      android:id="@+id/cempty"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="center_vertical"
+                      android:gravity="center"
+                      android:textColor="#CFE8DD"
+                      android:textSize="12sp" />
+              </FrameLayout>
+          </LinearLayout>
+          END_8
+          cat > "$R/layout/widget_cd_item.xml" <<'END_9'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/crow"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_vertical"
+              android:orientation="horizontal"
+              android:paddingTop="4dp"
+              android:paddingBottom="4dp">
+
+              <TextView
+                  android:id="@+id/cd"
+                  android:layout_width="62dp"
+                  android:layout_height="wrap_content"
+                  android:maxLines="1"
+                  android:textSize="14sp"
+                  android:textStyle="bold" />
+
+              <LinearLayout
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:orientation="vertical">
+
+                  <TextView
+                      android:id="@+id/cn"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:ellipsize="end"
+                      android:maxLines="1"
+                      android:textColor="#FFFFFF"
+                      android:textSize="12sp" />
+
+                  <TextView
+                      android:id="@+id/cm"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:maxLines="1"
+                      android:textColor="#CFE8DD"
+                      android:textSize="10sp" />
+              </LinearLayout>
+          </LinearLayout>
+          END_9
+          cat > "$R/drawable/widget_bg.xml" <<'END_10'
           <?xml version="1.0" encoding="utf-8"?>
           <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
               <solid android:color="#F20F2A22" />
               <corners android:radius="18dp" />
           </shape>
-          END_4
-          cat > "$R/xml/widget_info.xml" <<'END_5'
+          END_10
+          cat > "$R/xml/widget_info.xml" <<'END_11'
           <?xml version="1.0" encoding="utf-8"?>
           <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
               android:description="@string/widget_desc"
@@ -367,17 +697,48 @@ jobs:
               android:targetCellHeight="2"
               android:updatePeriodMillis="1800000"
               android:widgetCategory="home_screen" />
-          END_5
-          cat > "$R/values/widget_strings.xml" <<'END_6'
+          END_11
+          cat > "$R/xml/widget_countdown_info.xml" <<'END_12'
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:description="@string/widget_cd_desc"
+              android:initialLayout="@layout/widget_countdown"
+              android:minWidth="250dp"
+              android:minHeight="110dp"
+              android:resizeMode="horizontal|vertical"
+              android:targetCellWidth="4"
+              android:targetCellHeight="2"
+              android:updatePeriodMillis="1800000"
+              android:widgetCategory="home_screen" />
+          END_12
+          cat > "$R/values/widget_strings.xml" <<'END_13'
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
-              <string name="widget_desc">Hitung mundur, capaian harian, dan kegiatan berikutnya</string>
+              <string name="widget_desc">Hitung mundur terdekat, capaian, dan semua kegiatan hari ini</string>
+              <string name="widget_cd_desc">Semua acara yang sedang dihitung mundur</string>
+              <string name="widget_name_tasks">Yaumiyah ku · Kegiatan</string>
+              <string name="widget_name_cd">Yaumiyah ku · Hitung Mundur</string>
           </resources>
-          END_6
+          END_13
           python3 - <<'PY'
           p='android/app/src/main/AndroidManifest.xml'
           s=open(p).read()
-          r='    <receiver android:name="id.yaumiyahqu.app.WidgetProvider" android:exported="false">\n        <intent-filter>\n            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />\n        </intent-filter>\n        <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info" />\n    </receiver>\n'
+          r='''
+              <receiver android:name="id.yaumiyahqu.app.WidgetProvider" android:label="@string/widget_name_tasks" android:exported="false">
+                  <intent-filter>
+                      <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                  </intent-filter>
+                  <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info" />
+              </receiver>
+              <receiver android:name="id.yaumiyahqu.app.CountdownProvider" android:label="@string/widget_name_cd" android:exported="false">
+                  <intent-filter>
+                      <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                  </intent-filter>
+                  <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_countdown_info" />
+              </receiver>
+              <service android:name="id.yaumiyahqu.app.TaskService" android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
+              <service android:name="id.yaumiyahqu.app.CountdownService" android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
+          '''
           assert '</application>' in s
           open(p,'w').write(s.replace('</application>',r+'    </application>',1))
           PY
