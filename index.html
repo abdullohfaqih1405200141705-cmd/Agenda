@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#064e3b">
-<title>YaumiyahQu</title>
+<title>Yaumiyah ku</title>
 <style>
 :root{--bg:#f4f7f5;--cd:#fff;--tx:#17231e;--mu:#5d7068;--g:#0b6b4f;--gs:#e3f2ec;--am:#d98e04;--bd:#dde7e2;--gd:#064e3b;--ac:#0b6b4f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1713;--cd:#15231d;--tx:#e6f0eb;--mu:#93aaa0;--g:#3ecf9b;--gs:#1b3329;--am:#f5b73c;--bd:#26382f;--gd:#022c22}}
@@ -67,26 +67,28 @@ fieldset{border:1px solid var(--bd);border-radius:12px;margin:12px 0 0}.g3{displ
 .ring::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--cd)}
 .ring span{position:relative;font-size:20px;font-weight:800;color:var(--g)}
 .slot-h{cursor:pointer}.row .ic{opacity:.55}
+.ar{font-family:"Noto Naskh Arabic","Amiri","Traditional Arabic",serif;font-size:21px;line-height:2;direction:rtl;text-align:right}.hk .ar{color:#fff}summary{cursor:pointer}
+body{font-size:14px}.card,.card2{padding:10px;margin-bottom:10px}.big{font-size:28px}.ring{width:72px;height:72px}.ring::before{inset:7px}.ring span{font-size:18px}.pill{font-size:12.5px;padding:5px 11px}.dn h2{font-size:15px}.dg b{font-size:26px}.ar{font-size:20px}.ib{width:36px;height:36px}.row{padding:6px 0 6px 8px}.day{min-width:58px;padding:5px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<header class="top"><div class="tr"><span>☪ YaumiyahQu</span></div><p id="hk" class="hk"></p></header>
+<header class="top"><div class="tr"><span>☪ Yaumiyah ku</span><button id="cs" data-go="cloud" aria-label="Cloud" style="font-size:15px"></button></div><p id="hk" class="hk"></p></header>
 <main id="app">
 <div id="ty">
  <div class="dn"><button class="ib" data-go="prev" aria-label="Hari sebelumnya">◀</button><h2 id="yt"></h2><button class="ib" data-go="next" aria-label="Hari berikutnya">▶</button><label class="ib" style="margin:0;position:relative;display:grid;place-items:center">📅<input id="ydate" type="date" aria-label="Pilih tanggal"></label></div>
  <div class="sc" style="margin-top:10px"><button class="pill on" id="vj" data-go="yv|yj">📝 Jurnal</button><button class="pill" id="vr" data-go="yv|yr">📊 Rekap</button><button class="pill" data-go="today">Hari ini</button></div>
- <div id="yj">
+ <div id="yj"><small id="fs" style="margin:0 2px 8px"></small><form id="qc" class="dn" style="margin-bottom:10px"><input id="qi" maxlength="120" placeholder="Ketik cepat: Kajian malam Jumat jam 19.30" aria-label="Catat cepat" style="margin:0"><button class="ib">➕</button></form>
   <div class="card kpi" id="kcard"><div class="ring" id="kr"><span id="kp">0%</span></div><div style="flex:1"><b id="kl"></b><small id="kc"></small><button class="pill" data-go="reset" style="margin-top:8px">Ulangi hari ini</button></div></div>
   <div class="sc" id="dt"></div>
   <div class="sc" id="cf"></div>
   <div id="sl"></div>
-  <div class="act"><button class="sec" data-go="ts">🕒 Tambah jam</button></div>
+  <div id="mh"></div><div class="act"><button class="sec" data-go="ts">🕒 Tambah jam</button></div>
  </div>
  <div id="yr" hidden>
   <div class="card"><b>Capaian 7 hari terakhir</b><div class="bars" id="ch" style="margin-top:10px"></div></div>
   <div class="card"><b>Capaian per kategori (hari ini)</b><div id="cp"></div></div>
-  <div class="card"><b>Riwayat 10 hari</b><table><tbody id="hs"></tbody></table></div>
+  <div class="card" id="ins"></div><div class="card"><b>Riwayat 10 hari</b><table><tbody id="hs"></tbody></table></div><div class="act"><button class="sec" data-go="csv">Salin rekap (CSV)</button><button class="sec" data-go="prof">Profil & kategori</button></div>
  </div>
 </div>
 <div id="tc" hidden>
@@ -109,7 +111,7 @@ const $=s=>document.querySelector(s),KEY='yaumiyahqu_app_v1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const p2=n=>String(Math.max(0,Math.floor(n))).padStart(2,'0'),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const DAYS=['Ahad','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'],MON=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-const CATS=[['Adminda','📋'],['Ubudiyah','🕌'],['Taklimiyah','📖'],['PSD','👥'],['Kapok','📌'],['Kesehatan','🌿'],['Wakepda','🏛️'],['Kada','⭐'],['Pribadi','🏠']],CI=Object.fromEntries(CATS);
+const DC=[['Adminda','📋'],['Ubudiyah','🕌'],['Taklimiyah','📖'],['PSD','👥'],['Kapok','📌'],['Kesehatan','🌿'],['Wakepda','🏛️'],['Kada','⭐'],['Pribadi','🏠']];let CATS=DC,CI=Object.fromEntries(DC);const setCats=l=>{CATS=l;CI=Object.fromEntries(l)};
 const SL=[['04:00','06:00','Subuh, dzikir & tilawah'],['06:00','08:00','Pagi & Dhuha'],['08:00','12:00','Kegiatan pagi–siang'],['12:00','15:30','Dzuhur & siang'],['15:30','18:00','Ashar & dzikir sore'],['18:00','21:30','Maghrib, Isya & taklimiyah']];
 const AC=[
 ['Tahajud, Subuh berjamaah & dzikir pagi|Ubudiyah','Olahraga pagi|Kesehatan','Rencana program pekan ini|Kada','Dzuhur & silaturahmi keluarga|Pribadi','Siapkan berkas mingguan|Adminda','Kajian malam & murojaah|Taklimiyah'],
@@ -126,20 +128,14 @@ const DRE=/^\d{4}-\d\d-\d\d$/,TH_OK=['dynamic','red','orange','gold','green','bl
 
 /* ---------- Data ---------- */
 let DB,Y,C,cat='ALL',curD=null,sig='',lastDay='';
-const fresh=()=>{const t=ymd(new Date());return{tab:'y',yq:{sch:{},chk:{},carry:[],date:t,last:t},cd:{list:[],auto:true,active:null}}};
+const fresh=()=>{const t=ymd(new Date());return{tab:'y',yq:{sch:{},chk:{},carry:[],hide:{},muh:{},date:t,last:t},cd:{list:[],auto:true,active:null},cl:{}}};
 const valid=o=>o&&o.yq&&o.cd&&typeof o.yq.sch==='object'&&typeof o.yq.chk==='object'&&Array.isArray(o.yq.carry)&&Array.isArray(o.cd.list);
-function cleanItem(i){if(!i||!i.name||!i.target)return null;const t=new Date(i.target);if(isNaN(t))return null;const c=new Date(i.created||i.createdAt);
- return{id:String(i.id||'cd-'+uid()).replace(/[^\w-]/g,''),name:String(i.name).trim().slice(0,80),desc:String(i.desc??i.description??'').trim().slice(0,1000),theme:TH_OK.includes(i.theme||i.colorTheme)?(i.theme||i.colorTheme):'dynamic',target:t.toISOString(),created:(isNaN(c)?new Date():c).toISOString(),done:!!(i.done??i.notified)}}
-function clean(o){if(!valid(o))throw new Error('Format cadangan tidak dikenal');const f=fresh(),s=x=>String(x??'').slice(0,120);
- for(let d=0;d<7;d++){const z=o.yq.sch[d];if(z&&Array.isArray(z.slots)&&Array.isArray(z.acts))f.yq.sch[d]={slots:z.slots.map(a=>({id:s(a.id),s:s(a.s),e:s(a.e),l:s(a.l)})),acts:z.acts.map(a=>({id:s(a.id),sl:s(a.sl),t:s(a.t),c:CI[a.c]?a.c:'Pribadi'}))}}
- Object.keys(o.yq.chk).forEach(k=>{const v=o.yq.chk[k];if(DRE.test(k)&&v&&typeof v==='object')f.yq.chk[k]=Object.fromEntries(Object.keys(v).filter(i=>v[i]).map(i=>[i,1]))});
- f.yq.carry=o.yq.carry.filter(c=>c&&c.id&&DRE.test(c.date)).map(c=>({id:s(c.id),t:s(c.t),c:CI[c.c]?c.c:'Pribadi',date:c.date,s:s(c.s),e:s(c.e),l:s(c.l)}));
- if(DRE.test(o.yq.date))f.yq.date=o.yq.date;f.cd.list=o.cd.list.map(cleanItem).filter(Boolean).slice(0,200);f.cd.auto=o.cd.auto!==false;f.cd.active=o.cd.active||null;f.tab=o.tab==='c'?'c':'y';return f}
-function load(){try{const o=JSON.parse(localStorage.getItem(KEY));if(o)return clean(o)}catch(e){console.warn('Data tersimpan tidak terbaca, memulai baru',e)}return fresh()}
-function bind(){Y=DB.yq;C=DB.cd}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){console.error(e);toast('Data belum bisa disimpan. Penyimpanan penuh atau diblokir.')}}
+function load(){try{const o=JSON.parse(localStorage.getItem(KEY));if(valid(o)){o.yq.hide=o.yq.hide||{};o.yq.muh=o.yq.muh||{};o.cl=o.cl||{};return o}}catch(e){console.warn('Data tersimpan tidak terbaca, memulai baru',e)}return fresh()}
+function bind(){Y=DB.yq;C=DB.cd;setCats(Y.cats||DC)}
+function saveRaw(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){console.error(e);toast('Data belum bisa disimpan. Penyimpanan penuh atau diblokir.')}}
+function save(){wgQ();clQ();saveRaw()}
 function toast(m,label,fn){const t=document.createElement('div');t.className='toast';t.textContent=m;if(fn){const b=document.createElement('button');b.textContent=label;b.onclick=()=>{fn();t.remove()};t.append(b)}$('#toasts').append(t);setTimeout(()=>t.remove(),fn?7000:4000)}
-function undoable(msg,fn){const s=JSON.stringify(DB);fn();save();rAll();toast(msg,'Urungkan',()=>{DB=JSON.parse(s);bind();save();rAll()})}
+function undoable(msg,fn){const s=JSON.stringify(DB);fn();save();rAll();toast(msg,'Urungkan',()=>{const cl=DB.cl;DB=JSON.parse(s);DB.cl=cl;bind();save();rAll()})}
 
 /* ---------- Sheet ---------- */
 function sheet(title,body){const b=$('#sheetBox');b.innerHTML=`<div class="sht"><b>${title}</b><button data-close aria-label="Tutup">✕</button></div>${body}`;$('#sheet').hidden=false;return b}
@@ -149,7 +145,7 @@ function closeSheet(){$('#sheet').hidden=true;curD=null}
 function day(d){if(!Y.sch[d])Y.sch[d]={slots:SL.map((s,i)=>({id:`d${d}s${i}`,s:s[0],e:s[1],l:s[2]})),acts:AC[d].map((a,i)=>{const[t,c]=a.split('|');return{id:`d${d}a${i}`,sl:`d${d}s${i}`,t,c}})};return Y.sch[d]}
 const doneOn=id=>Object.keys(Y.chk).sort().find(d=>Y.chk[d]&&Y.chk[d][id]);
 const carryVis=(c,ds)=>{const d=doneOn(c.id);return ds>=c.date&&!(d&&d<ds)};
-function eff(ds){const b=day(dow(ds)),slots=b.slots.map(s=>({...s})),acts=b.acts.map(a=>({...a,carry:0}));
+function eff(ds){const b=day(dow(ds)),slots=b.slots.map(s=>({...s})),acts=b.acts.filter(a=>!(Y.hide[ds]&&Y.hide[ds][a.id])).map(a=>({...a,carry:0}));
  Y.carry.forEach(c=>{if(!carryVis(c,ds))return;let s=slots.find(x=>x.s===c.s)||slots[0];if(!s){s={id:'v'+c.id,s:c.s,e:c.e,l:c.l};slots.push(s)}acts.push({id:c.id,sl:s.id,t:c.t,c:c.c,carry:1})});
  return{slots:slots.sort((a,b)=>a.s.localeCompare(b.s)),acts}}
 function stats(ds){const e=eff(ds),ck=Y.chk[ds]||{},n=e.acts.length,dn=e.acts.filter(a=>ck[a.id]).length;let sa=0,sd=0;
@@ -166,18 +162,18 @@ function rY(){const ds=Y.date,d=dow(ds),st=stats(ds),e=eff(ds),ck=Y.chk[ds]||{};
  const html=e.slots.map(s=>{const all=e.acts.filter(a=>a.sl===s.id),dn=all.filter(a=>ck[a.id]).length,l=show.filter(a=>a.sl===s.id);if(cat!=='ALL'&&!l.length)return'';
   return`<section class="card"><div class="sh2 slot-h" data-go="es|${esc(s.id)}" role="button" tabindex="0" aria-label="Ubah jam ${esc(s.s)}"><div><b>${esc(s.s)}–${esc(s.e)}</b> ${esc(s.l)}<small>${dn}/${all.length} selesai · ketuk untuk ubah</small></div></div>${l.map(row).join('')||'<p class="em">Belum ada kegiatan. Bismillah, tambahkan satu.</p>'}<button class="add" data-go="as|${esc(s.id)}">+ Kegiatan di jam ini</button></section>`}).join('');
  $('#sl').innerHTML=html||`<p class="em">Alhamdulillah, semua kegiatan ${esc(cat)} sudah selesai.</p>`;
- if(!$('#yr').hidden)rR()}
-function rR(){const ds=Y.date,ck=Y.chk[ds]||{},e=eff(ds);
+ rX();if(!$('#yr').hidden)rR()}
+function rR(){rI();const ds=Y.date,ck=Y.chk[ds]||{},e=eff(ds);
  $('#ch').innerHTML=[6,5,4,3,2,1,0].map(i=>{const x=addD(ds,-i),p=stats(x).pct;return`<div><small>${p}%</small><i style="height:${p}%"></i>${DAYS[dow(x)].slice(0,3)}</div>`}).join('');
  $('#cp').innerHTML=CATS.map(([c,ic])=>{const a=e.acts.filter(x=>x.c===c),dn=a.filter(x=>ck[x.id]).length,p=a.length?Math.round(dn/a.length*100):0;return`<div style="margin-top:8px"><div class="dn"><span style="flex:1">${ic} ${c}</span><small>${dn}/${a.length} (${p}%)</small></div><div class="pb"><i style="width:${p}%"></i></div></div>`}).join('');
  const t=ymd(new Date());$('#hs').innerHTML=Array.from({length:10},(_,i)=>{const x=addD(t,-i),s=stats(x);return`<tr><td>${esc(fmtD(x))}</td><td>${s.dn}/${s.n}</td><td><b>${s.pct}%</b></td><td><button class="pill" data-go="jump|${x}">Buka</button></td></tr>`}).join('')}
 function slotForm(id){const sc=day(dow(Y.date)),s=id&&sc.slots.find(x=>x.id===id);if(id&&!s)return;
- const b=sheet(s?'Ubah Jam':'Tambah Jam',`<form id="f"><div class="g3" style="grid-template-columns:1fr 1fr"><label>Mulai<input name="s" type="time" required></label><label>Selesai<input name="e" type="time" required></label></div><label>Nama sesi<input name="l" required maxlength="60" placeholder="Contoh: Subuh & pagi"></label><button class="pri">Simpan</button>${s?'<button type="button" class="sec dng" id="sd" style="width:100%;margin-top:8px">Hapus jam ini</button>':''}</form>`),f=b.querySelector('#f');
- f.s.value=s?s.s:'04:30';f.e.value=s?s.e:'06:00';f.l.value=s?s.l:'';if(s)f.querySelector('#sd').onclick=()=>{closeSheet();GO.ds(s.id)};
+ const b=sheet(s?'Ubah Jam':'Tambah Jam',`<form id="f"><div class="g3" style="grid-template-columns:1fr 1fr"><label>Mulai<input name="s" type="time" required></label><label>Selesai<input name="e" type="time" required></label></div><label>Nama sesi<input name="l" required maxlength="60" placeholder="Contoh: Subuh & pagi"></label><button class="pri">Simpan</button>${s?'<div class="act"><button type="button" class="sec" id="sg">Geser ke sore</button></div><button type="button" class="sec dng" id="sd" style="width:100%;margin-top:8px">Hapus jam ini</button>':''}</form>`),f=b.querySelector('#f');
+ f.s.value=s?s.s:'04:30';f.e.value=s?s.e:'06:00';f.l.value=s?s.l:'';if(s){f.querySelector('#sd').onclick=()=>{closeSheet();GO.ds(s.id)};f.querySelector('#sg').onclick=()=>{closeSheet();shift(s.id)}}
  f.onsubmit=ev=>{ev.preventDefault();const v={s:f.s.value,e:f.e.value,l:f.l.value.trim()};if(!v.l)return;if(s)Object.assign(s,v);else sc.slots.push({id:'s'+uid(),...v});save();closeSheet();rY()}}
 function actForm(id,pre){const e=eff(Y.date),a=id&&e.acts.find(x=>x.id===id);if(id&&!a)return;if(!e.slots.length){toast('Tambahkan jam dulu, ya.');return slotForm()}
  const b=sheet(a?'Ubah Kegiatan':'Tambah Kegiatan',`<form id="f"><label>Jam<select name="sl">${e.slots.map(s=>`<option value="${esc(s.id)}">${esc(s.s)}–${esc(s.e)} ${esc(s.l)}</option>`).join('')}</select></label><label>Nama kegiatan<input name="t" required maxlength="120" placeholder="Contoh: Shalat Dhuha"></label><label>Kategori<select name="c">${CATS.map(c=>`<option value="${c[0]}">${c[1]} ${c[0]}</option>`).join('')}</select></label><fieldset><label class="rd"><input type="radio" name="k" value="0" checked><span>Hanya di hari ini (berulang tiap pekan)</span></label><label class="rd"><input type="radio" name="k" value="1"><span>Tetap muncul sampai selesai. Setelah dicentang, tidak muncul lagi.</span></label></fieldset><button class="pri">Simpan</button></form>`),f=b.querySelector('#f');
- f.sl.value=a?a.sl:(pre||e.slots[0].id);f.t.value=a?a.t:'';f.c.value=a?a.c:(cat!=='ALL'?cat:'Ubudiyah');f.k.value=a&&a.carry?'1':'0';
+ f.sl.value=a?a.sl:(pre||e.slots[0].id);f.t.value=a?a.t:'';f.c.value=a?a.c:(cat!=='ALL'?cat:(CI.Ubudiyah?'Ubudiyah':CATS[0][0]));f.k.value=a&&a.carry?'1':'0';
  f.onsubmit=ev=>{ev.preventDefault();const t=f.t.value.trim(),k=f.k.value==='1',sl=e.slots.find(x=>x.id===f.sl.value)||e.slots[0];if(!t)return;
   const old=a&&Y.carry.find(x=>x.id===a.id),base=day(dow(Y.date));
   if(old&&k){Object.assign(old,{t,c:f.c.value,s:sl.s,e:sl.e,l:sl.l})}
@@ -228,16 +224,16 @@ function tick(){const n=Date.now();let ch=false;C.list.forEach(it=>{if(!it.done&
 function cdForm(){const b=sheet('Acara Baru',`<form id="f" novalidate><label>Nama acara<input name="nm" maxlength="80" placeholder="Tulis nama acara"></label>
 <fieldset style="padding:0 10px 10px"><legend>🌙 Tanggal Hijriah</legend><div class="g3"><label>Tgl<select name="hd"></select></label><label>Bulan<select name="hm"></select></label><label>Tahun<select name="hy"></select></label></div><label>⏰ Jam<input name="ht" type="time" value="08:00"></label><small id="pv" style="margin-top:8px"></small>
 <details style="margin-top:8px"><summary class="lnk">Atau pilih lewat kalender Masehi</summary><label>Tanggal & jam Masehi<input name="dt" type="datetime-local"></label></details></fieldset>
-<label>Warna<select name="th">${thOpts}</select></label><label>Catatan (boleh kosong)<textarea name="ds" maxlength="1000" placeholder="Lokasi, agenda, atau pengingat"></textarea></label><div class="err" id="er" role="alert"></div><button class="pri">Mulai Hitung Mundur</button></form>`),f=b.querySelector('#f');
+<label>Warna<select name="th">${thOpts}</select></label><label>Catatan (boleh kosong)<textarea name="ds" maxlength="1000" placeholder="Lokasi, agenda, atau pengingat"></textarea></label><label class="rd" id="tpl" hidden><input type="checkbox" name="ck" checked><span>Tambahkan checklist persiapan (H-30, H-14, H-7, H-1) ke Yaumiyah</span></label><div class="err" id="er" role="alert"></div><button class="pri">Mulai Hitung Mundur</button></form>`),f=b.querySelector('#f');
  for(let d=1;d<=30;d++)f.hd.add(new Option(p2(d),d));HM.forEach((m,i)=>f.hm.add(new Option(`${i+1}. ${m}`,i+1)));const cy=toH(new Date()).y;for(let y=cy;y<=cy+15;y++)f.hy.add(new Option(y+' H',y));
  const pv=d=>{$('#pv').textContent='📅 Masehi: '+mLab(d)},fromH=()=>{const[h,m]=(f.ht.value||'08:00').split(':').map(Number),d=toG(+f.hd.value,+f.hm.value,+f.hy.value,h||0,m||0);f.dt.value=lIso(d);pv(d)},
  fromG=()=>{const d=new Date(f.dt.value);if(isNaN(d))return;const h=toH(d);if(!h)return;if(![...f.hy.options].some(o=>+o.value===h.y))f.hy.add(new Option(h.y+' H',h.y));f.hd.value=h.d;f.hm.value=h.m;f.hy.value=h.y;f.ht.value=`${p2(d.getHours())}:${p2(d.getMinutes())}`;pv(d)};
- [f.hd,f.hm,f.hy,f.ht].forEach(e=>e.oninput=fromH);f.dt.oninput=fromG;const t=new Date();t.setDate(t.getDate()+1);t.setHours(8,0,0,0);f.dt.value=lIso(t);fromG();
+ [f.hd,f.hm,f.hy,f.ht].forEach(e=>e.oninput=fromH);f.dt.oninput=fromG;f.nm.oninput=()=>{$('#tpl').hidden=!tplOf(f.nm.value)};const t=new Date();t.setDate(t.getDate()+1);t.setHours(8,0,0,0);f.dt.value=lIso(t);fromG();
  f.onsubmit=ev=>{ev.preventDefault();const nm=f.nm.value.trim(),t=new Date(f.dt.value),er=m=>{$('#er').textContent=m};
   if(!nm)return er('Nama acara belum diisi.');if(isNaN(t)||t<=Date.now())return er('Tanggal dan jam harus setelah sekarang.');
   try{if('Notification' in window&&Notification.permission==='default')Notification.requestPermission()}catch(e){console.warn(e)}
   C.list.push({id:'cd-'+uid(),name:nm,desc:f.ds.value.trim(),theme:f.th.value,target:t.toISOString(),created:new Date().toISOString(),done:false});
-  C.auto=true;ensure();save();closeSheet();rCD();toast('Alhamdulillah, acara ditambahkan.')}}
+  const tk=tplOf(nm);if(tk&&f.ck.checked)addTpl(tk,nm,t);C.auto=true;ensure();save();closeSheet();rCD();rY();toast('Alhamdulillah, acara ditambahkan.')}}
 function detail(id){const it=C.list.find(x=>x.id===id);if(!it)return;curD=id;const t=new Date(it.target);
  const b=sheet('Rincian Acara',`<span class="bd" id="q-b"></span><h3 id="q-n" style="margin:8px 0"></h3><div class="dg" id="q-g"><div><b id="q-d">00</b>hari</div><div><b id="q-h">00</b>jam</div><div><b id="q-m">00</b>menit</div><div><b id="q-s">00</b>detik</div></div><div class="pb"><i id="q-p"></i></div><small id="q-pt"></small>
 <div class="card2" style="margin-top:12px"><b id="q-u"></b><p class="mu" id="q-un" style="margin:4px 0"></p><label>Warna acara<select id="q-th">${thOpts}</select></label></div>
@@ -254,6 +250,135 @@ function paintDetail(n){const it=C.list.find(x=>x.id===curD);if(!it||!$('#q-g'))
  $('#q-p').style.width=st.pct+'%';$('#q-pt').textContent=`Sisa waktu ${st.pct.toFixed(1)}%`;$('#q-b').textContent=st.x?'⏰ Waktu telah tiba':'⚡ Timer aktif';$('#q-u').textContent=TH[k][0];$('#q-un').textContent=note;$('#q-t1').textContent=st.x?'0 jam':Math.floor(st.df/36e5)+' jam'}
 const delCD=id=>undoable('Acara dihapus.',()=>{C.list=C.list.filter(i=>i.id!==id);ensure()});
 
+/* ---------- Tambahan ---------- */
+const VS=[['فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا','Maka sesungguhnya bersama kesulitan ada kemudahan. Sesungguhnya bersama kesulitan ada kemudahan.','QS. Al-Insyirah: 5–6'],
+['أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ','Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.','QS. Ar-Ra’d: 28'],
+['إِنَّ اللَّهَ مَعَ الصَّابِرِينَ','Sesungguhnya Allah bersama orang-orang yang sabar.','QS. Al-Baqarah: 153'],
+['وَمَنْ يَتَّقِ اللَّهَ يَجْعَلْ لَهُ مَخْرَجًا ۝ وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ','Barangsiapa bertakwa kepada Allah, Dia akan membukakan jalan keluar baginya dan memberinya rezeki dari arah yang tidak disangka-sangka.','QS. At-Talaq: 2–3'],
+['وَأَنْ لَيْسَ لِلْإِنْسَانِ إِلَّا مَا سَعَىٰ','Manusia hanya memperoleh apa yang telah diusahakannya.','QS. An-Najm: 39'],
+['لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا','Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.','QS. Al-Baqarah: 286'],
+['لَئِنْ شَكَرْتُمْ لَأَزِيدَنَّكُمْ','Jika kamu bersyukur, niscaya Aku akan menambah (nikmat) kepadamu.','QS. Ibrahim: 7'],
+['فَإِذَا عَزَمْتَ فَتَوَكَّلْ عَلَى اللَّهِ','Apabila engkau telah membulatkan tekad, maka bertawakallah kepada Allah.','QS. Ali Imran: 159']];
+const MD=[['😊','Syukur',6],['🙂','Biasa',4],['😔','Sedih',0],['😰','Cemas',1],['😴','Lelah',5]];
+const PRE={
+mhs:{c:[['Skripsi/Tugas','📚'],['Kuliah','🎓'],['Organisasi','👥'],['Ubudiyah','🕌'],['Self-Care','🌿']],s:[['04:30','06:00','Subuh & tilawah'],['06:00','08:00','Dhuha & persiapan'],['08:00','15:00','Kuliah & tugas'],['15:00','18:00','Ashar & organisasi'],['18:00','21:30','Maghrib, Isya & belajar']],a:[[0,'Shalat Subuh & tilawah','Ubudiyah'],[1,'Shalat Dhuha','Ubudiyah'],[1,'Sarapan & olahraga ringan','Self-Care'],[2,'Hadir kuliah','Kuliah'],[2,'Kerjakan skripsi atau tugas','Skripsi/Tugas'],[3,'Dzikir sore','Ubudiyah'],[3,'Kegiatan organisasi','Organisasi'],[4,'Muhasabah & tidur tepat waktu','Self-Care']]},
+krj:{c:[['Deep Work','💻'],['Meeting','🗓️'],['Olahraga','🏃'],['Tilawah','📖'],['Keuangan','💰']],s:[['04:30','06:30','Subuh & tilawah'],['06:30','08:30','Olahraga & berangkat'],['08:30','12:00','Deep work pagi'],['12:00','15:30','Dzuhur & meeting'],['15:30','18:00','Ashar & pulang'],['18:00','21:30','Maghrib, Isya & keuangan']],a:[[0,'Subuh & tilawah satu halaman','Tilawah'],[1,'Olahraga 20 menit','Olahraga'],[2,'Tugas utama tanpa gangguan','Deep Work'],[3,'Dzuhur berjamaah','Tilawah'],[3,'Meeting & koordinasi','Meeting'],[4,'Ashar & dzikir sore','Tilawah'],[5,'Catat pemasukan dan pengeluaran','Keuangan']]}};
+const TPL={nikah:[[30,'Tetapkan tanggal, anggaran & daftar undangan'],[14,'Konfirmasi katering, dekorasi & busana'],[7,'Cek dokumen & hubungi tamu inti'],[1,'Istirahat, siapkan perlengkapan & perbanyak doa']],sidang:[[30,'Revisi akhir naskah & jadwalkan sidang'],[14,'Latihan presentasi bersama teman'],[7,'Cetak berkas & siapkan slide'],[1,'Tidur cukup, shalat hajat & cek perlengkapan']]};
+const tplOf=n=>/nikah|walimah|lamaran/i.test(n)?'nikah':/sidang|skripsi|ujian|seminar|tesis|presentasi/i.test(n)?'sidang':null;
+function addTpl(k,nm,t){const now=ymd(new Date());TPL[k].forEach(([n,x])=>{let d=addD(ymd(t),-n);if(d<now)d=now;Y.carry.push({id:'a'+uid(),t:`H-${n}: ${x} (${nm})`,c:CATS[CATS.length-1][0],date:d,s:'08:00',e:'12:00',l:'Persiapan'})})}
+
+/* Profil */
+function profSheet(){sheet('Profil & Kategori',`<p class="mu">Pilih profil agar jam dan kategori langsung sesuai. Semuanya tetap bisa kamu ubah atau hapus.</p><div class="act" style="flex-direction:column">${[['mhs','🎓 Mahasiswa & Akademisi'],['krj','💼 Pekerja Muda'],['santri','🕌 Santri / Aktivis Dakwah']].map(x=>`<button class="sec" data-go="pre|${x[0]}" style="text-align:left">${x[1]}</button>`).join('')}</div><label>Kategori (satu per baris, awali dengan emoji)</label><textarea id="cats">${esc(CATS.map(c=>c[1]+' '+c[0]).join('\n'))}</textarea><button class="pri" data-go="cats">Simpan kategori</button>`)}
+function applyPre(k){const p=PRE[k],first=!Y.persona;undoable('Profil diterapkan. Silakan ubah sesuai kebutuhan.',()=>{Y.persona=k;cat='ALL';if(p){Y.cats=p.c;Y.sch={};for(let d=0;d<7;d++)Y.sch[d]={slots:p.s.map((x,i)=>({id:`d${d}s${i}`,s:x[0],e:x[1],l:x[2]})),acts:p.a.map((x,i)=>({id:`d${d}a${i}`,sl:`d${d}s${i}`,t:x[1],c:x[2]}))}}else{Y.cats=null;if(!first)Y.sch={}}setCats(Y.cats||DC)})}
+function saveCats(){const l=$('#cats').value.split('\n').map(x=>x.trim()).filter(Boolean).slice(0,12).map(x=>{const m=x.match(/^(\S+)\s+(.+)$/);return m&&!/^[\p{L}\p{N}]/u.test(m[1])?[m[2].slice(0,24),m[1].slice(0,4)]:[x.slice(0,24),'🏷️']});
+ if(!l.length)return;closeSheet();undoable('Kategori disimpan.',()=>{Y.cats=l;cat='ALL';setCats(l)})}
+
+/* Puasa sunnah */
+function fasts(ds){const d=pd(ds),h=toH(d),r=[],w=d.getDay();if(!h)return r;if(h.m===9)return['Ramadhan (wajib)'];
+ if((h.m===10&&h.d===1)||(h.m===12&&h.d>=10&&h.d<=13))return r;
+ if(w===1)r.push('Senin');if(w===4)r.push('Kamis');if(h.d>=13&&h.d<=15)r.push('Ayyamul Bidh');if(h.m===12&&h.d===9)r.push('Arafah');if(h.m===1&&(h.d===9||h.d===10))r.push(h.d===9?'Tasu’a':'Asyura');return r}
+
+/* Panel tambahan di jurnal */
+const gs=()=>[...document.querySelectorAll('#mh .gi')].map(i=>i.value.trim());
+function rX(){const ds=Y.date,tod=ymd(new Date()),f=fasts(ds),nx=ds===tod?fasts(addD(ds,1)):[];
+ $('#fs').textContent=(f.length?'🌙 Puasa sunnah hari ini: '+f.join(', ')+'. ':'')+(nx.length?'Besok puasa '+nx.join(', ')+': niatkan dan sahur ya.':'');
+ const o=$('#mh details'),op=o&&o.open,m=Y.muh[ds]||{},v=m.m!=null?VS[MD[m.m][2]]:null;
+ $('#mh').innerHTML=`<details class="card"${op?' open':''}><summary><b>🌙 Muhasabah malam</b></summary><div class="sc" style="margin-top:8px">${MD.map((x,i)=>`<button class="pill${m.m===i?' on':''}" data-go="mood|${i}">${x[0]} ${x[1]}</button>`).join('')}</div>${v?`<div class="card2"><div class="ar">${v[0]}</div><small style="color:var(--tx)">${esc(v[1])} (${esc(v[2])})</small></div>`:''}<label>3 hal yang kusyukuri</label>${[0,1,2].map(i=>`<input class="gi" maxlength="100" value="${esc((m.g||[])[i]||'')}" placeholder="Syukur ke-${i+1}">`).join('')}<button class="pri" data-go="msv">Simpan muhasabah</button></details>`}
+function setMood(i){Y.muh[Y.date]={...(Y.muh[Y.date]||{}),g:gs(),m:+i};save();rX()}
+function saveMuh(){Y.muh[Y.date]={...(Y.muh[Y.date]||{}),g:gs()};save();toast('Alhamdulillah, muhasabah tersimpan.')}
+
+/* Geser ke sore */
+function shift(id){const e=eff(Y.date),sl=e.slots.find(x=>x.id===id),to=e.slots.find(x=>/Ashar|sore|pulang/i.test(x.l)&&x.s>sl.s)||e.slots[e.slots.length-1],ck=Y.chk[Y.date]||{},ps=e.acts.filter(a=>a.sl===id&&!ck[a.id]);
+ if(!ps.length||to.id===id)return toast('Tidak ada kegiatan yang perlu digeser.');
+ undoable(`${ps.length} kegiatan digeser ke ${to.l}.`,()=>{Y.hide[Y.date]=Y.hide[Y.date]||{};ps.forEach(a=>{const c=Y.carry.find(x=>x.id===a.id);if(c)Object.assign(c,{s:to.s,e:to.e,l:to.l});else{Y.hide[Y.date][a.id]=1;Y.carry.push({id:'a'+uid(),t:a.t,c:a.c,date:Y.date,s:to.s,e:to.e,l:to.l})}})})}
+
+/* Catat cepat */
+function quick(raw){const t=raw.trim();if(!t)return;const x=t.toLowerCase().replace(/[’']/g,''),tm=x.match(/jam\s*(\d{1,2})(?:[.:](\d{2}))?/),hh=tm?+tm[1]:null,mm=tm&&tm[2]?+tm[2]:0,now=new Date(),tod=ymd(now);
+ const hn=HM.map(m=>m.toLowerCase()),hr=x.match(new RegExp('(\\d{1,2})\\s+('+hn.join('|')+')')),gm=x.match(new RegExp('(\\d{1,2})\\s+('+MON.map(m=>m.toLowerCase()).join('|')+')'));
+ let nm=x.replace(/jam\s*\d{1,2}([.:]\d{2})?/,'').replace(hr?hr[0]:gm?gm[0]:'@@','').replace(/\s+/g,' ').trim();nm=nm.charAt(0).toUpperCase()+nm.slice(1)||'Acara';
+ if(hr||gm){let d;if(hr){const m=hn.indexOf(hr[2])+1;let y=toH(now).y;d=toG(+hr[1],m,y,hh??8,mm);if(d<=now)d=toG(+hr[1],m,y+1,hh??8,mm)}else{const mi=MON.findIndex(m=>m.toLowerCase()===gm[2]);d=new Date(now.getFullYear(),mi,+gm[1],hh??8,mm);if(d<=now)d.setFullYear(d.getFullYear()+1)}
+  C.list.push({id:'cd-'+uid(),name:nm.slice(0,80),desc:'',theme:'dynamic',target:d.toISOString(),created:now.toISOString(),done:false});C.auto=true;ensure();save();rAll();return toast(`Hitung mundur dibuat: ${nm} (${mLab(d)})`)}
+ const nd=['ahad|minggu','senin','selasa','rabu','kamis','jumat','sabtu'],wi=nd.findIndex(n=>new RegExp('\\b('+n+')\\b').test(x));let off=/besok/.test(x)?1:/lusa/.test(x)?2:0;
+ if(wi>=0){const tw=/malam\s+(ahad|minggu|senin|selasa|rabu|kamis|jumat|sabtu)/.test(x)?(wi+6)%7:wi;off=(tw-now.getDay()+7)%7}
+ const ds=addD(tod,off),e=eff(ds),mn=hh!=null?hh*60+mm:null,M=s=>+s.slice(0,2)*60+ +s.slice(3),sl=(mn!=null&&e.slots.find(s=>M(s.s)<=mn&&mn<M(s.e)))||(/malam/.test(x)?e.slots[e.slots.length-1]:e.slots[0]);
+ if(!sl)return toast('Tambahkan jam dulu, ya.');
+ const kc=/kajian|ngaji|tilawah|shalat|sholat|dzikir|liqa|halaqah/.test(x)&&CI.Ubudiyah?'Ubudiyah':CATS[0][0];
+ Y.carry.push({id:'a'+uid(),t:nm+(tm?` (${p2(hh)}.${p2(mm)})`:''),c:kc,date:ds,s:sl.s,e:sl.e,l:sl.l});Y.date=ds;save();rAll();toast(`Masuk jurnal ${fmtD(ds)}: ${nm}`)}
+
+/* Evaluasi & ekspor */
+function rI(){const t=ymd(new Date()),a=Array.from({length:7},()=>[]);for(let i=0;i<28;i++){const x=addD(t,-i),s=stats(x);if(s.n)a[dow(x)].push(s.pct)}
+ const v=a.map((l,i)=>[l.length>1?l.reduce((p,c)=>p+c,0)/l.length:null,i]).filter(x=>x[0]!=null).sort((p,q)=>p[0]-q[0]),tot=Object.values(Y.chk).reduce((p,c)=>p+Object.keys(c).length,0),gd=tot>150?'🌳🌸':tot>60?'🌳':tot>20?'🌿':'🌱';
+ $('#ins').innerHTML=`<b>Evaluasi pekan</b><p style="margin:6px 0">${v.length>1&&v[0][0]<v[v.length-1][0]-10?`Capaianmu paling rendah di hari ${DAYS[v[0][1]]} (rata-rata ${Math.round(v[0][0])}%). Coba ringankan kegiatan hari itu atau pindahkan sebagian ke hari ${DAYS[v[v.length-1][1]]}.`:'Belum cukup data untuk membaca pola. Teruslah istiqamah beberapa hari lagi.'}</p><small>Kebun amalmu: ${gd} · ${tot} amalan tuntas</small>`}
+function copyCsv(){const t=ymd(new Date()),r=['Tanggal,Hari,Selesai,Total,Persen'];for(let i=29;i>=0;i--){const x=addD(t,-i),s=stats(x);r.push(`${x},${DAYS[dow(x)]},${s.dn},${s.n},${s.pct}`)}
+ (navigator.clipboard?navigator.clipboard.writeText(r.join('\n')):Promise.reject()).then(()=>toast('Rekap 30 hari disalin. Tempel di Excel, Sheets, atau WhatsApp.'),()=>toast('Tidak bisa menyalin. Izinkan akses papan klip.'))}
+
+/* ---------- Widget layar utama (jembatan ke kode native) ---------- */
+const WB=()=>{try{return window.Capacitor&&Capacitor.isNativePlatform()?(Capacitor.Plugins.WidgetBridge||null):null}catch(e){return null}};
+var wgT=null;
+function wgQ(){if(!WB())return;clearTimeout(wgT);wgT=setTimeout(wgPush,800)}
+async function wgPull(){const W=WB();if(!W)return;try{const r=await W.takePending();let ch=false;
+ String(r.items||'').split(';').filter(Boolean).forEach(x=>{const[d,id]=x.split('|');if(DRE.test(d)&&id){(Y.chk[d]=Y.chk[d]||{})[id]=1;ch=true}});if(ch){save();rY()}}catch(e){console.warn(e)}}
+async function wgPush(){const W=WB();if(!W)return;try{const ds=ymd(new Date()),e=eff(ds),ck=Y.chk[ds]||{},st=stats(ds),it=C.list.find(i=>+new Date(i.target)>Date.now()),sOf=a=>(e.slots.find(s=>s.id===a.sl)||{s:''}).s;
+ const d={d:ds,n:st.n,dn:st.dn,tk:e.acts.filter(a=>!ck[a.id]).sort((p,q)=>sOf(p).localeCompare(sOf(q))).slice(0,6).map(a=>({id:a.id,t:a.t.slice(0,40)}))};
+ if(it){d.ts=+new Date(it.target);d.en=it.name.slice(0,30)}await W.set({json:JSON.stringify(d)})}catch(x){console.warn(x)}}
+
+/* ---------- Sinkronisasi cloud (Supabase, offline-first) ---------- */
+const SB={url:'https://jeduzsituiexxcyadcgk.supabase.co',key:'sb_publishable_EFJikLoLHKOmFlPcd1v1Gg_rnZffKfG'};
+const CFG=()=>{const c=DB.cl.cfg||{};return{url:(SB.url||c.url||'').replace(/\/+$/,''),key:SB.key||c.key||''}};
+const payload=()=>({v:1,yq:{sch:Y.sch,chk:Y.chk,carry:Y.carry,hide:Y.hide,muh:Y.muh,cats:Y.cats||null,persona:Y.persona||null},cd:{list:C.list,auto:C.auto,active:C.active}});
+const hash=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)+s.length};
+async function sb(path,o={}){const{url,key}=CFG();if(!url||!key)throw new Error('Alamat server belum diisi.');
+ const h={apikey:key,'Content-Type':'application/json',...(o.headers||{})};if(o.auth!==false){await tokenOk();h.Authorization='Bearer '+DB.cl.tok.a}
+ const r=await fetch(url+path,{method:o.method||'GET',headers:h,body:o.body?JSON.stringify(o.body):undefined}),t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){console.warn(e)}
+ if(!r.ok)throw new Error((j&&(j.error_description||j.msg||j.message))||('Kesalahan server '+r.status));return j}
+const expAt=j=>Math.floor(Date.now()/1000)+(j.expires_in||3600);
+async function tokenOk(){const t=DB.cl.tok;if(!t)throw new Error('Belum masuk.');if(t.exp-60>Date.now()/1000)return;
+ try{const j=await sb('/auth/v1/token?grant_type=refresh_token',{method:'POST',auth:false,body:{refresh_token:t.r}});DB.cl.tok={...t,a:j.access_token,r:j.refresh_token,exp:expAt(j)};saveRaw()}
+ catch(e){if(e instanceof TypeError)throw e;DB.cl.tok=null;saveRaw();clStat();throw new Error('Sesi berakhir. Silakan masuk lagi.')}}
+async function clAuth(up,em,pw){const j=await sb(up?'/auth/v1/signup':'/auth/v1/token?grant_type=password',{method:'POST',auth:false,body:{email:em,password:pw}});
+ if(!j.access_token)return 'confirm';DB.cl.tok={a:j.access_token,r:j.refresh_token,exp:expAt(j),uid:j.user.id,em:j.user.email};DB.cl.rev=null;DB.cl.h=null;saveRaw();return 'ok'}
+function applyCloud(p){const q=p.yq||{};Object.assign(Y,{sch:q.sch||{},chk:q.chk||{},carry:Array.isArray(q.carry)?q.carry:[],hide:q.hide||{},muh:q.muh||{},cats:Array.isArray(q.cats)?q.cats:null,persona:q.persona||Y.persona});
+ if(p.cd){C.list=(Array.isArray(p.cd.list)?p.cd.list:[]).slice(0,200);C.auto=p.cd.auto!==false;C.active=p.cd.active||null}setCats(Y.cats||DC);ensure()}
+function mergeIn(p,pc){const q=p.yq||{},c=p.cd||{},m=JSON.parse(JSON.stringify(payload())),my=m.yq,mc=m.cd;
+ Object.keys(q.chk||{}).forEach(d=>{my.chk[d]=Object.assign({},q.chk[d],my.chk[d])});
+ const ids=new Set(my.carry.map(x=>x.id));(q.carry||[]).forEach(x=>{if(!ids.has(x.id))my.carry.push(x)});
+ Object.keys(q.hide||{}).forEach(d=>{my.hide[d]=Object.assign({},q.hide[d],my.hide[d])});
+ Object.keys(q.muh||{}).forEach(d=>{if(!my.muh[d])my.muh[d]=q.muh[d]});
+ const cid=new Set(mc.list.map(x=>x.id));(c.list||[]).forEach(x=>{if(!cid.has(x.id))mc.list.push(x)});
+ if(pc&&(q.persona||Object.keys(q.sch||{}).length)){my.sch=q.sch||{};my.cats=q.cats||null;my.persona=q.persona||my.persona}
+ else if(!Object.keys(my.sch).length&&q.sch){my.sch=q.sch;my.cats=q.cats||my.cats}
+ applyCloud(m)}
+async function clPush(rev,json,h){const L=DB.cl,r=await sb(`/rest/v1/app_state?user_id=eq.${L.tok.uid}&rev=eq.${rev}`,{method:'PATCH',body:{data:JSON.parse(json),rev:rev+1},headers:{Prefer:'return=representation'}});
+ if(!r||!r.length)throw new Error('KONFLIK');L.rev=r[0].rev;L.h=h}
+let clBusy=false,clT=null;
+function clStat(m,k){const L=DB.cl;if(m!==undefined)L.msg=m;const e=$('#cs');if(!e)return;e.textContent=!L.tok?'☁️':k==='err'?'☁️❗':k==='off'?'☁️…':'☁️✓';e.title=L.msg||''}
+function clQ(){if(!DB.cl||!DB.cl.tok)return;clearTimeout(clT);clT=setTimeout(()=>cloudSync(),4000)}
+async function cloudSync(manual,n=0){const L=DB.cl;if(!L||!L.tok||clBusy)return;if(navigator.onLine===false)return clStat('Offline: akan disinkronkan nanti','off');
+ clBusy=true;
+ try{const uid=L.tok.uid,rows=await sb(`/rest/v1/app_state?select=data,rev&user_id=eq.${uid}`),row=rows&&rows[0],mine=JSON.stringify(payload()),h=hash(mine),dirty=h!==L.h;
+  if(!row){const r=await sb('/rest/v1/app_state?on_conflict=user_id',{method:'POST',body:{user_id:uid,data:JSON.parse(mine),rev:1},headers:{Prefer:'resolution=merge-duplicates,return=representation'}});L.rev=r[0].rev;L.h=h}
+  else if(row.rev===L.rev){if(dirty)await clPush(row.rev,mine,h)}
+  else{if(L.rev==null||dirty){mergeIn(row.data,L.rev==null);const m2=JSON.stringify(payload());await clPush(row.rev,m2,hash(m2))}
+   else{applyCloud(row.data);L.rev=row.rev;L.h=hash(JSON.stringify(payload()))}
+   saveRaw();wgQ();rAll()}
+  L.at=Date.now();saveRaw();clStat('Tersinkron '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}))}
+ catch(e){if(e.message==='KONFLIK'&&n<2){clBusy=false;return cloudSync(manual,n+1)}console.warn(e);clStat(e instanceof TypeError?'Offline: akan disinkronkan nanti':e.message,e instanceof TypeError?'off':'err');if(manual)toast(DB.cl.msg)}
+ finally{clBusy=false}}
+function cloudSheet(){const L=DB.cl,c=CFG(),tok=L.tok;let h;
+ if(!c.url||!c.key)h=`<p class="mu">Isi alamat server sekali saja. Buat proyek gratis di supabase.com, jalankan berkas SQL, lalu salin Project URL dan kunci publishable dari Settings → API Keys.</p><label>Project URL<input id="c1" inputmode="url" placeholder="https://xxxx.supabase.co"></label><label>Kunci publishable<input id="c2" placeholder="sb_publishable_..."></label><div class="err" id="er"></div><button class="pri" id="c3">Simpan</button>`;
+ else if(!tok)h=`<p class="mu">Masuk agar data tersimpan aman dan bisa dipulihkan saat ganti HP. Aplikasi tetap bisa dipakai tanpa sinyal.</p><label>Email<input id="c4" type="email" autocomplete="email"></label><label>Kata sandi (min. 8 karakter)<input id="c5" type="password" autocomplete="current-password"></label><div class="err" id="er"></div><div class="act"><button class="sec" id="c6">Masuk</button><button class="sec" id="c7">Daftar</button></div>`;
+ else h=`<p>Masuk sebagai <b>${esc(tok.em)}</b></p><small id="c8"></small><div class="act"><button class="sec" id="c9">Sinkronkan sekarang</button><button class="sec" id="ca">Keluar</button></div><button class="sec dng" id="cb" style="width:100%;margin-top:8px">Hapus data cloud</button><div class="err" id="er"></div>`;
+ const b=sheet('☁️ Cloud',h),q=s=>b.querySelector(s),er=m=>{q('#er').textContent=m};
+ if(!c.url||!c.key){q('#c3').onclick=()=>{const u=q('#c1').value.trim().replace(/\/+$/,''),k=q('#c2').value.trim();if(!/^https:\/\/[\w.-]+$/i.test(u))return er('Alamat harus diawali https://, contoh https://xxxx.supabase.co');if(k.length<20)return er('Kunci belum benar.');L.cfg={url:u,key:k};saveRaw();cloudSheet()};return}
+ if(!tok){const go=async up=>{const em=q('#c4').value.trim(),pw=q('#c5').value;if(!em||pw.length<8)return er('Isi email dan kata sandi (min. 8 karakter).');er('Memproses…');
+   try{const r=await clAuth(up,em,pw);closeSheet();if(r==='confirm')return toast('Pendaftaran berhasil. Cek email untuk konfirmasi, lalu masuk.');clStat();toast('Alhamdulillah, berhasil masuk.');await cloudSync(true)}catch(e){er(e instanceof TypeError?'Tidak ada sinyal.':e.message)}};
+  q('#c6').onclick=()=>go(false);q('#c7').onclick=()=>go(true);return}
+ q('#c8').textContent=L.at?'Terakhir tersinkron '+new Date(L.at).toLocaleString('id-ID'):'Belum pernah tersinkron';
+ q('#c9').onclick=async()=>{await cloudSync(true);q('#c8').textContent=L.msg||''};
+ q('#ca').onclick=()=>{L.tok=null;L.rev=null;L.h=null;saveRaw();closeSheet();clStat();toast('Keluar. Data di HP tetap ada.')};
+ let sure=false;q('#cb').onclick=async e=>{if(!sure){sure=true;e.target.textContent='Yakin? Ketuk sekali lagi';return}
+  try{await sb('/rest/v1/app_state?user_id=eq.'+tok.uid,{method:'DELETE'});L.tok=null;L.rev=null;L.h=null;saveRaw();closeSheet();clStat();toast('Data cloud dihapus. Data di HP tetap ada.')}catch(x){er(x.message)}}}
+
 /* ---------- Navigasi ---------- */
 function setTab(t){DB.tab=t;$('#ty').hidden=t!=='y';$('#tc').hidden=t!=='c';$('#n-y').setAttribute('aria-selected',t==='y');$('#n-c').setAttribute('aria-selected',t==='c');$('#fab').setAttribute('aria-label',t==='y'?'Tambah kegiatan':'Tambah acara');save();rAll()}
 function rAll(){Y=DB.yq;C=DB.cd;rY();rCD()}
@@ -265,22 +390,26 @@ const GO={
  ts:()=>slotForm(),es:id=>slotForm(id),ta:()=>actForm(),as:id=>actForm('',id),ea:id=>actForm(id),
  ds:id=>undoable('Jam dihapus.',()=>{const s=day(dow(Y.date));s.slots=s.slots.filter(x=>x.id!==id);s.acts=s.acts.filter(x=>x.sl!==id)}),
  da:id=>undoable('Kegiatan dihapus.',()=>{if(Y.carry.some(x=>x.id===id))Y.carry=Y.carry.filter(x=>x.id!==id);else{const s=day(dow(Y.date));s.acts=s.acts.filter(x=>x.id!==id)}}),
- fab:()=>DB.tab==='y'?actForm():cdForm(),hero:()=>{const it=heroItem();if(it)detail(it.id)},cdd:id=>detail(id),cdx:id=>delCD(id),
+ fab:()=>DB.tab==='y'?actForm():cdForm(),csv:copyCsv,prof:profSheet,mood:setMood,msv:saveMuh,cloud:cloudSheet,pre:k=>{closeSheet();applyPre(k)},cats:saveCats,hero:()=>{const it=heroItem();if(it)detail(it.id)},cdd:id=>detail(id),cdx:id=>delCD(id),
  auto:()=>{C.auto=!C.auto;ensure();save();rCD();toast(C.auto?'Acara paling dekat selalu di atas.':'Mode manual: ketuk acara lalu “Jadikan utama”.')}};
 document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(el){e.stopPropagation();const[n,...r]=el.dataset.go.split('|');if(GO[n])GO[n](r.join('|'));return}
  if(e.target.id==='sheet'||e.target.closest('[data-close]'))closeSheet()});
 document.addEventListener('change',e=>{const k=e.target.dataset.ck;
  if(k!==undefined){const ds=Y.date;Y.chk[ds]=Y.chk[ds]||{};const was=stats(ds).pct;if(e.target.checked)Y.chk[ds][k]=1;else delete Y.chk[ds][k];save();rY();if(stats(ds).pct===100&&was<100)toast('Alhamdulillah, semua kegiatan hari ini selesai. Barakallahu fiik.')}
  if(e.target.id==='ydate'&&DRE.test(e.target.value))goDay(e.target.value)});
+document.addEventListener('submit',e=>{if(e.target.id==='qc'){e.preventDefault();quick($('#qi').value);$('#qi').value=''}});
+window.addEventListener('online',()=>cloudSync());
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){tick();wgPull();wgQ();cloudSync()}});
 
 /* ---------- Mulai ---------- */
 DB=load();bind();const today=ymd(new Date());if(Y.last!==today){Y.last=today;Y.date=today}
 $('#ty').hidden=DB.tab==='c';$('#tc').hidden=DB.tab!=='c';$('#n-y').setAttribute('aria-selected',DB.tab!=='c');$('#n-c').setAttribute('aria-selected',DB.tab==='c');
-const HK=['Amalan yang paling dicintai Allah ialah yang rutin, walau sedikit. (HR. Bukhari dan Muslim)','Sesungguhnya bersama kesulitan ada kemudahan. (QS. Al-Insyirah: 6)','Dengan mengingat Allah, hati menjadi tenang. (QS. Ar-Ra’d: 28)','Sesungguhnya Allah bersama orang-orang yang sabar. (QS. Al-Baqarah: 153)','Sebaik-baik manusia ialah yang paling bermanfaat bagi sesama. (HR. Ahmad)','Barangsiapa bertakwa kepada Allah, Dia akan membukakan jalan keluar baginya. (QS. At-Talaq: 2)','Manusia hanya memperoleh apa yang telah diusahakannya. (QS. An-Najm: 39)'];
-$('#hk').textContent='“'+HK[Math.floor(Date.now()/864e5)%HK.length].replace(/ \(/,'” (');
+const hkv=VS[Math.floor(Date.now()/864e5)%VS.length];$('#hk').innerHTML=`<div class="ar">${hkv[0]}</div>${esc(hkv[1])} (${esc(hkv[2])})`;
 save();rY();rCD();tick();setInterval(tick,1000);
+if(!Y.seen){Y.seen=1;save();profSheet()}
+wgPull();wgQ();clStat();cloudSync();
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){const b=document.createElement('button');b.type='button';b.className='ib';b.textContent='🎤';b.setAttribute('aria-label','Bicara');b.onclick=()=>{const r=new SR();r.lang='id-ID';r.onresult=ev=>quick(ev.results[0][0].transcript);r.onerror=()=>toast('Suara belum bisa dikenali.');r.start()};$('#qc').append(b)}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){console.warn(e)}
 })();
 </script>

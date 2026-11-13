@@ -1,10 +1,10 @@
 {
-  "name": "yaumiyahqu",
-  "version": "1.0.0",
+  "name": "yaumiyahku",
+  "version": "1.2.0",
   "private": true,
-  "description": "YaumiyahQu: jurnal harian Islami dan hitung mundur Hijriah",
+  "description": "Yaumiyah ku: jurnal harian Islami, hitung mundur Hijriah, widget, dan sinkronisasi cloud",
   "scripts": {
-    "build": "node -e \"const f=require('fs');f.mkdirSync('www',{recursive:true});f.copyFileSync('src/index.html','www/index.html')\""
+    "build": "node -e \"const f=require('fs');f.mkdirSync('www',{recursive:true});f.copyFileSync('index.html','www/index.html')\""
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
