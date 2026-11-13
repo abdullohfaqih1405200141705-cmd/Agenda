@@ -1,4 +1,4 @@
-name: Bangun APK YaumiyahQu
+name: Bangun APK Yaumiyah ku
 
 on:
   push:
@@ -37,6 +37,351 @@ jobs:
           npx cap add android
           npx cap sync android
 
+      - name: Tambah izin Android (getar)
+        run: |
+          python3 - <<'PY'
+          p='android/app/src/main/AndroidManifest.xml'
+          s=open(p).read()
+          assert '<application' in s
+          perm='    <uses-permission android:name="android.permission.VIBRATE" />\n'
+          open(p,'w').write(s.replace('<application',perm+'    <application',1))
+          PY
+
+      - name: Pasang widget layar utama (kode native)
+        run: |
+          set -e
+          J=android/app/src/main/java/id/yaumiyahqu/app
+          R=android/app/src/main/res
+          mkdir -p "$J" "$R/layout" "$R/xml" "$R/drawable" "$R/values"
+          cat > "$J/MainActivity.java" <<'END_0'
+          package id.yaumiyahqu.app;
+
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  registerPlugin(WidgetBridge.class);
+                  super.onCreate(savedInstanceState);
+              }
+          }
+          END_0
+          cat > "$J/WidgetBridge.java" <<'END_1'
+          package id.yaumiyahqu.app;
+
+          import android.content.Context;
+          import android.content.SharedPreferences;
+          import com.getcapacitor.JSObject;
+          import com.getcapacitor.Plugin;
+          import com.getcapacitor.PluginCall;
+          import com.getcapacitor.PluginMethod;
+          import com.getcapacitor.annotation.CapacitorPlugin;
+
+          @CapacitorPlugin(name = "WidgetBridge")
+          public class WidgetBridge extends Plugin {
+
+              @PluginMethod
+              public void set(PluginCall call) {
+                  String json = call.getString("json");
+                  if (json == null) {
+                      call.reject("Data widget kosong");
+                      return;
+                  }
+                  Context c = getContext();
+                  c.getSharedPreferences(WidgetProvider.PREFS, Context.MODE_PRIVATE).edit().putString("data", json).apply();
+                  WidgetProvider.refreshAll(c);
+                  call.resolve();
+              }
+
+              @PluginMethod
+              public void takePending(PluginCall call) {
+                  SharedPreferences p = getContext().getSharedPreferences(WidgetProvider.PREFS, Context.MODE_PRIVATE);
+                  String items = p.getString("pending", "");
+                  p.edit().remove("pending").apply();
+                  JSObject r = new JSObject();
+                  r.put("items", items);
+                  call.resolve(r);
+              }
+          }
+          END_1
+          cat > "$J/WidgetProvider.java" <<'END_2'
+          package id.yaumiyahqu.app;
+
+          import android.app.PendingIntent;
+          import android.appwidget.AppWidgetManager;
+          import android.appwidget.AppWidgetProvider;
+          import android.content.ComponentName;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.SharedPreferences;
+          import android.net.Uri;
+          import android.view.View;
+          import android.widget.RemoteViews;
+          import java.text.SimpleDateFormat;
+          import java.util.Calendar;
+          import java.util.Date;
+          import java.util.Locale;
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+
+          public class WidgetProvider extends AppWidgetProvider {
+              static final String PREFS = "yq_widget";
+              static final String ACT_TOGGLE = "id.yaumiyahqu.app.TOGGLE";
+              private static final int[] ROWS = {R.id.t1, R.id.t2, R.id.t3};
+              private static final int FLAGS = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+
+              @Override
+              public void onUpdate(Context c, AppWidgetManager m, int[] ids) {
+                  for (int id : ids) render(c, m, id);
+              }
+
+              @Override
+              public void onReceive(Context c, Intent i) {
+                  if (ACT_TOGGLE.equals(i.getAction())) {
+                      toggle(c, i.getStringExtra("id"));
+                      refreshAll(c);
+                      return;
+                  }
+                  super.onReceive(c, i);
+              }
+
+              static void refreshAll(Context c) {
+                  AppWidgetManager m = AppWidgetManager.getInstance(c);
+                  for (int id : m.getAppWidgetIds(new ComponentName(c, WidgetProvider.class))) render(c, m, id);
+              }
+
+              private static void toggle(Context c, String taskId) {
+                  if (taskId == null) return;
+                  SharedPreferences p = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+                  try {
+                      JSONObject d = new JSONObject(p.getString("data", "{}"));
+                      JSONArray tk = d.optJSONArray("tk");
+                      boolean hit = false;
+                      if (tk != null) {
+                          for (int i = 0; i < tk.length(); i++) {
+                              JSONObject o = tk.getJSONObject(i);
+                              if (taskId.equals(o.optString("id")) && o.optInt("x", 0) == 0) {
+                                  o.put("x", 1);
+                                  hit = true;
+                              }
+                          }
+                      }
+                      if (!hit) return;
+                      d.put("dn", d.optInt("dn", 0) + 1);
+                      p.edit()
+                          .putString("data", d.toString())
+                          .putString("pending", p.getString("pending", "") + d.optString("d") + "|" + taskId + ";")
+                          .apply();
+                  } catch (Exception e) {
+                      // Data rusak: diabaikan, aplikasi akan menulis ulang saat dibuka.
+                  }
+              }
+
+              private static long dayStart(long t) {
+                  Calendar k = Calendar.getInstance();
+                  k.setTimeInMillis(t);
+                  k.set(Calendar.HOUR_OF_DAY, 0);
+                  k.set(Calendar.MINUTE, 0);
+                  k.set(Calendar.SECOND, 0);
+                  k.set(Calendar.MILLISECOND, 0);
+                  return k.getTimeInMillis();
+              }
+
+              private static void render(Context c, AppWidgetManager m, int widgetId) {
+                  RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget_yaumiyah);
+                  SharedPreferences p = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+                  long now = System.currentTimeMillis();
+                  String today = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date(now));
+                  String ev = "Belum ada acara";
+                  String msg = "Buka aplikasi untuk memulai.";
+                  int pct = 0;
+                  boolean fresh = false;
+                  JSONArray tk = null;
+                  try {
+                      String raw = p.getString("data", null);
+                      if (raw != null) {
+                          JSONObject d = new JSONObject(raw);
+                          if (d.has("ts")) {
+                              long ts = d.getLong("ts");
+                              String nm = d.optString("en");
+                              long days = Math.round((dayStart(ts) - dayStart(now)) / 86400000.0);
+                              if (ts <= now) ev = "Waktu tiba · " + nm;
+                              else if (days <= 0) ev = "Hari ini · " + nm;
+                              else ev = "H-" + days + "  " + nm;
+                          }
+                          int n = d.optInt("n", 0);
+                          int dn = d.optInt("dn", 0);
+                          pct = n > 0 ? Math.min(100, dn * 100 / n) : 0;
+                          fresh = today.equals(d.optString("d"));
+                          tk = d.optJSONArray("tk");
+                          msg = fresh ? "Alhamdulillah, semua kegiatan hari ini selesai."
+                                      : "Buka aplikasi untuk memuat kegiatan hari ini.";
+                      }
+                  } catch (Exception e) {
+                      msg = "Buka aplikasi untuk memuat ulang.";
+                  }
+
+                  v.setTextViewText(R.id.ev, ev);
+                  v.setTextViewText(R.id.pc, pct + "%");
+                  v.setProgressBar(R.id.pb, 100, pct, false);
+
+                  Intent li = c.getPackageManager().getLaunchIntentForPackage(c.getPackageName());
+                  PendingIntent launch = li == null ? null : PendingIntent.getActivity(c, 1, li, FLAGS);
+                  if (launch != null) v.setOnClickPendingIntent(R.id.root, launch);
+
+                  int shown = 0;
+                  if (fresh && tk != null) {
+                      try {
+                          for (int i = 0; i < tk.length() && shown < ROWS.length; i++) {
+                              JSONObject o = tk.getJSONObject(i);
+                              if (o.optInt("x", 0) == 1) continue;
+                              String id = o.optString("id");
+                              v.setTextViewText(ROWS[shown], "○  " + o.optString("t"));
+                              v.setViewVisibility(ROWS[shown], View.VISIBLE);
+                              Intent in = new Intent(c, WidgetProvider.class)
+                                  .setAction(ACT_TOGGLE)
+                                  .setData(Uri.parse("yq://task/" + Uri.encode(id)))
+                                  .putExtra("id", id);
+                              v.setOnClickPendingIntent(ROWS[shown], PendingIntent.getBroadcast(c, 0, in, FLAGS));
+                              shown++;
+                          }
+                      } catch (Exception e) {
+                          // Tampilkan baris yang sempat dimuat.
+                      }
+                  }
+                  if (shown == 0) {
+                      v.setTextViewText(ROWS[0], msg);
+                      v.setViewVisibility(ROWS[0], View.VISIBLE);
+                      if (launch != null) v.setOnClickPendingIntent(ROWS[0], launch);
+                      shown = 1;
+                  }
+                  for (int i = shown; i < ROWS.length; i++) v.setViewVisibility(ROWS[i], View.GONE);
+                  m.updateAppWidget(widgetId, v);
+              }
+          }
+          END_2
+          cat > "$R/layout/widget_yaumiyah.xml" <<'END_3'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/root"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/widget_bg"
+              android:orientation="vertical"
+              android:padding="10dp">
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:gravity="center_vertical"
+                  android:orientation="horizontal">
+
+                  <TextView
+                      android:id="@+id/ev"
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:ellipsize="end"
+                      android:maxLines="1"
+                      android:textColor="#F5B73C"
+                      android:textSize="13sp"
+                      android:textStyle="bold" />
+
+              </LinearLayout>
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="5dp"
+                  android:gravity="center_vertical"
+                  android:orientation="horizontal">
+
+                  <ProgressBar
+                      android:id="@+id/pb"
+                      style="?android:attr/progressBarStyleHorizontal"
+                      android:layout_width="0dp"
+                      android:layout_height="5dp"
+                      android:layout_weight="1"
+                      android:max="100"
+                      android:progressBackgroundTint="#2A4A3E"
+                      android:progressTint="#F5B73C" />
+
+                  <TextView
+                      android:id="@+id/pc"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginStart="8dp"
+                      android:textColor="#FFFFFF"
+                      android:textSize="11sp"
+                      android:textStyle="bold" />
+              </LinearLayout>
+
+              <TextView
+                  android:id="@+id/t1"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="6dp"
+                  android:ellipsize="end"
+                  android:maxLines="1"
+                  android:textColor="#FFFFFF"
+                  android:textSize="12sp" />
+
+              <TextView
+                  android:id="@+id/t2"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="4dp"
+                  android:ellipsize="end"
+                  android:maxLines="1"
+                  android:textColor="#FFFFFF"
+                  android:textSize="12sp" />
+
+              <TextView
+                  android:id="@+id/t3"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="4dp"
+                  android:ellipsize="end"
+                  android:maxLines="1"
+                  android:textColor="#FFFFFF"
+                  android:textSize="12sp" />
+          </LinearLayout>
+          END_3
+          cat > "$R/drawable/widget_bg.xml" <<'END_4'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+              <solid android:color="#F20F2A22" />
+              <corners android:radius="18dp" />
+          </shape>
+          END_4
+          cat > "$R/xml/widget_info.xml" <<'END_5'
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:description="@string/widget_desc"
+              android:initialLayout="@layout/widget_yaumiyah"
+              android:minWidth="250dp"
+              android:minHeight="110dp"
+              android:resizeMode="horizontal|vertical"
+              android:targetCellWidth="4"
+              android:targetCellHeight="2"
+              android:updatePeriodMillis="1800000"
+              android:widgetCategory="home_screen" />
+          END_5
+          cat > "$R/values/widget_strings.xml" <<'END_6'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <string name="widget_desc">Hitung mundur, capaian harian, dan kegiatan berikutnya</string>
+          </resources>
+          END_6
+          python3 - <<'PY'
+          p='android/app/src/main/AndroidManifest.xml'
+          s=open(p).read()
+          r='    <receiver android:name="id.yaumiyahqu.app.WidgetProvider" android:exported="false">\n        <intent-filter>\n            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />\n        </intent-filter>\n        <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info" />\n    </receiver>\n'
+          assert '</application>' in s
+          open(p,'w').write(s.replace('</application>',r+'    </application>',1))
+          PY
+
       - name: Kompilasi APK
         working-directory: ./android
         run: |
@@ -44,18 +389,18 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Ganti nama berkas
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk YaumiyahQu.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk YaumiyahKu.apk
 
       - name: Simpan sebagai artefak
         uses: actions/upload-artifact@v4
         with:
-          name: YaumiyahQu-apk
-          path: YaumiyahQu.apk
+          name: YaumiyahKu-apk
+          path: YaumiyahKu.apk
 
       - name: Terbitkan di Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "v${{ github.run_number }}" YaumiyahQu.apk \
-            --title "YaumiyahQu v${{ github.run_number }}" \
-            --notes "APK siap pasang. Unduh YaumiyahQu.apk lalu ketuk untuk memasang."
+          gh release create "v${{ github.run_number }}" YaumiyahKu.apk \
+            --title "Yaumiyah ku v${{ github.run_number }}" \
+            --notes "APK siap pasang. Unduh YaumiyahKu.apk lalu ketuk untuk memasang."
