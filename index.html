@@ -179,7 +179,7 @@ function rY(){const ds=Y.date,d=dow(ds),st=stats(ds),e=eff(ds),ck=Y.chk[ds]||{};
  $('#dt').innerHTML=DAYS.map((n,i)=>{const s=stats(addD(ds,i-d));return`<button class="day${i===d?' on':''}" data-go="day|${i}"><b>${n}</b><br>${s.pct}%</button>`}).join('');
  $('#cf').innerHTML=['ALL',...CATS.map(c=>c[0])].map(c=>`<button class="pill${c===cat?' on':''}" data-go="cat|${c}">${c==='ALL'?'Semua':CI[c]+' '+c}</button>`).join('');
  const show=e.acts.filter(a=>cat==='ALL'||(a.c===cat&&!ck[a.id]));
- const row=a=>{const dn=!!ck[a.id];return`<div class="row${dn?' ok':''}"><label><input type="checkbox" class="chk" data-ck="${esc(a.id)}"${dn?' checked':''}><span>${esc(a.t)}<small><i class="cat">${CI[a.c]||'🏠'} ${esc(a.c)}</i>${a.carry?'<i class="cat rp">🔄 Sampai selesai</i>':''}</small></span></label><span><button class="ic" data-go="ea|${esc(a.id)}" aria-label="Ubah kegiatan">✏️</button><button class="ic" data-go="da|${esc(a.id)}" aria-label="Hapus kegiatan">🗑️</button></span></div>`};
+ const row=a=>{const dn=!!ck[a.id];return`<div class="row${dn?' ok':''}"><label><input type="checkbox" class="chk" data-ck="${esc(a.id)}"${dn?' checked':''}><span>${esc(a.t)}<small><i class="cat">${CI[a.c]||'🏠'} ${esc(a.c)}</i>${a.carry?'<i class="cat rp">🔄 Sampai selesai</i>':''}${a.g?'<i class="cat">🔁 Setiap hari</i>':''}</small></span></label><span><button class="ic" data-go="ea|${esc(a.id)}" aria-label="Ubah kegiatan">✏️</button><button class="ic" data-go="da|${esc(a.id)}" aria-label="Hapus kegiatan">🗑️</button></span></div>`};
  const html=e.slots.map(s=>{const all=e.acts.filter(a=>a.sl===s.id),dn=all.filter(a=>ck[a.id]).length,l=show.filter(a=>a.sl===s.id);if(cat!=='ALL'&&!l.length)return'';
   return`<section class="card"><div class="sh2 slot-h" data-go="es|${esc(s.id)}" role="button" tabindex="0" aria-label="Ubah jam ${esc(s.s)}"><div><b>${esc(s.s)}–${esc(s.e)}</b> ${esc(s.l)}<small>${dn}/${all.length} selesai · ketuk untuk ubah</small></div></div>${l.map(row).join('')||'<p class="em">Belum ada kegiatan. Bismillah, tambahkan satu.</p>'}<button class="add" data-go="as|${esc(s.id)}">+ Kegiatan di jam ini</button></section>`}).join('');
  $('#sl').innerHTML=html||`<p class="em">Alhamdulillah, semua kegiatan ${esc(cat)} sudah selesai.</p>`;
@@ -192,18 +192,25 @@ function slotForm(id){const sc=day(dow(Y.date)),s=id&&sc.slots.find(x=>x.id===id
  const b=sheet(s?'Ubah Jam':'Tambah Jam',`<form id="f"><div class="g3" style="grid-template-columns:1fr 1fr"><label>Mulai<input name="s" type="time" required></label><label>Selesai<input name="e" type="time" required></label></div><label>Nama sesi<input name="l" required maxlength="60" placeholder="Contoh: Subuh & pagi"></label><button class="pri">Simpan</button>${s?'<div class="act"><button type="button" class="sec" id="sg">Geser ke sore</button></div><button type="button" class="sec dng" id="sd" style="width:100%;margin-top:8px">Hapus jam ini</button>':''}</form>`),f=b.querySelector('#f');
  f.s.value=s?s.s:'04:30';f.e.value=s?s.e:'06:00';f.l.value=s?s.l:'';if(s){f.querySelector('#sd').onclick=()=>{closeSheet();GO.ds(s.id)};f.querySelector('#sg').onclick=()=>{closeSheet();shift(s.id)}}
  f.onsubmit=ev=>{ev.preventDefault();const v={s:f.s.value,e:f.e.value,l:f.l.value.trim()};if(!v.l)return;if(s)Object.assign(s,v);else sc.slots.push({id:'s'+uid(),...v});save();closeSheet();rY()}}
+function slotFor(slots,sl){const M=s=>+s.slice(0,2)*60+ +s.slice(3);return slots.find(x=>x.s===sl.s)||slots.find(x=>x.l===sl.l)||slotAt(slots,M(sl.s))}
+function addDaily(t,c,sl){const g='g'+uid();for(let d=0;d<7;d++){const b=day(d),s=b.slots.length?slotFor(b.slots,sl):null;if(s)b.acts.push({id:`${g}-${d}`,g,sl:s.id,t,c})}}
 function actForm(id,pre){const e=eff(Y.date),a=id&&e.acts.find(x=>x.id===id);if(id&&!a)return;if(!e.slots.length){toast('Tambahkan jam dulu, ya.');return slotForm()}
- const b=sheet(a?'Ubah Kegiatan':'Tambah Kegiatan',`<form id="f"><label>Jam<select name="sl">${e.slots.map(s=>`<option value="${esc(s.id)}">${esc(s.s)}–${esc(s.e)} ${esc(s.l)}</option>`).join('')}</select></label><label>Nama kegiatan<input name="t" required maxlength="120" placeholder="Contoh: Shalat Dhuha"></label><label>Kategori<select name="c">${CATS.map(c=>`<option value="${c[0]}">${c[1]} ${c[0]}</option>`).join('')}</select></label><fieldset><label class="rd"><input type="radio" name="k" value="0" checked><span>Hanya di hari ini (berulang tiap pekan)</span></label><label class="rd"><input type="radio" name="k" value="1"><span>Tetap muncul sampai selesai. Setelah dicentang, tidak muncul lagi.</span></label></fieldset><button class="pri">Simpan</button></form>`),f=b.querySelector('#f');
- f.sl.value=a?a.sl:(pre||e.slots[0].id);f.t.value=a?a.t:'';f.c.value=a?a.c:(cat!=='ALL'?cat:(CI.Ubudiyah?'Ubudiyah':CATS[0][0]));f.k.value=a&&a.carry?'1':'0';
- f.onsubmit=ev=>{ev.preventDefault();const t=f.t.value.trim(),k=f.k.value==='1',sl=e.slots.find(x=>x.id===f.sl.value)||e.slots[0];if(!t)return;
-  const old=a&&Y.carry.find(x=>x.id===a.id),base=day(dow(Y.date));
-  if(old&&k){Object.assign(old,{t,c:f.c.value,s:sl.s,e:sl.e,l:sl.l})}
-  else{if(a){if(old)Y.carry=Y.carry.filter(x=>x!==old);else base.acts=base.acts.filter(x=>x.id!==a.id)}
-   const nid=a?a.id:'a'+uid();
-   if(k)Y.carry.push({id:nid,t,c:f.c.value,date:Y.date,s:sl.s,e:sl.e,l:sl.l});
-   else{const sid=base.slots.some(x=>x.id===sl.id)?sl.id:(base.slots[0]&&base.slots[0].id);if(!sid)return toast('Tambahkan jam dulu, ya.');base.acts.push({id:nid,sl:sid,t,c:f.c.value})}}
-  save();closeSheet();rY();toast('Alhamdulillah, tersimpan.')}}
-
+ const ci=a&&Y.carry.find(x=>x.id===a.id);
+ const b=sheet(a?'Ubah Kegiatan':'Tambah Kegiatan',`<form id="f"><label>Jam<select name="sl">${e.slots.map(s=>`<option value="${esc(s.id)}">${esc(s.s)}–${esc(s.e)} ${esc(s.l)}</option>`).join('')}</select></label><label>Nama kegiatan<input name="t" required maxlength="120" placeholder="Contoh: Shalat Dhuha"></label><label>Kategori<select name="c">${CATS.map(c=>`<option value="${esc(c[0])}">${esc(c[1])} ${esc(c[0])}</option>`).join('')}</select></label><fieldset><label class="rd"><input type="radio" name="k" value="d"><span>Berlaku setiap hari, Ahad–Sabtu (otomatis muncul di semua hari)</span></label><label class="rd"><input type="radio" name="k" value="w"><span>Hanya di hari ini (berulang tiap pekan)</span></label><label class="rd"><input type="radio" name="k" value="c"><span>Tetap muncul sampai selesai. Setelah dicentang, tidak muncul lagi.</span></label></fieldset><button class="pri">Simpan</button></form>`),f=b.querySelector('#f');
+ f.sl.value=a?a.sl:(pre||e.slots[0].id);f.t.value=a?a.t:'';f.c.value=a?a.c:(cat!=='ALL'?cat:(CI.Ubudiyah?'Ubudiyah':CATS[0][0]));f.k.value=ci?'c':a&&a.g?'d':'w';
+ f.onsubmit=ev=>{ev.preventDefault();const t=f.t.value.trim(),k=f.k.value,cg=f.c.value,sl=e.slots.find(x=>x.id===f.sl.value)||e.slots[0],w=day(dow(Y.date));if(!t)return;
+  if(k==='w'&&!w.slots.length)return toast('Tambahkan jam dulu, ya.');
+  if(a&&a.g&&k==='d'){const same=f.sl.value===a.sl;for(let d=0;d<7;d++){const bd=day(d);bd.acts.forEach(x=>{if(x.g===a.g){x.t=t;x.c=cg;if(!same){const s=slotFor(bd.slots,sl);if(s)x.sl=s.id}}})}}
+  else if(ci&&k==='c')Object.assign(ci,{t,c:cg,s:sl.s,e:sl.e,l:sl.l});
+  else{let keep=null;
+   if(a){if(ci)Y.carry=Y.carry.filter(x=>x!==ci);else if(a.g){for(let d=0;d<7;d++){const bd=day(d);bd.acts=bd.acts.filter(x=>x.g!==a.g)}}else{keep=a.id;w.acts=w.acts.filter(x=>x.id!==a.id)}}
+   if(k==='c')Y.carry.push({id:'a'+uid(),t,c:cg,date:Y.date,s:sl.s,e:sl.e,l:sl.l});
+   else if(k==='d')addDaily(t,cg,sl);
+   else{const sid=w.slots.some(x=>x.id===sl.id)?sl.id:w.slots[0].id;w.acts.push({id:keep||'a'+uid(),sl:sid,t,c:cg})}}
+  save();closeSheet();rY();toast(k==='d'?'Alhamdulillah, kegiatan muncul di semua hari.':'Alhamdulillah, tersimpan.')}}
+function delDaily(a){sheet('Hapus Kegiatan Harian',`<p class="mu">“${esc(a.t)}” berlaku setiap hari. Hapus dari mana?</p><div class="act" style="flex-direction:column"><button class="sec" data-go="dd|one|${esc(a.id)}">Hanya hari ${DAYS[dow(Y.date)]} (setiap pekan)</button><button class="sec dng" data-go="dd|all|${esc(a.id)}">Dari semua hari</button></div>`)}
+function ddel(arg){const i=arg.indexOf('|'),m=arg.slice(0,i),id=arg.slice(i+1);closeSheet();let wd=-1,a=null;for(let d=0;d<7&&!a;d++){a=day(d).acts.find(x=>x.id===id)||null;if(a)wd=d}if(!a)return;
+ undoable(m==='all'?'Kegiatan dihapus dari semua hari.':`Kegiatan dihapus dari hari ${DAYS[wd]}.`,()=>{if(m==='all'){for(let d=0;d<7;d++){const bd=day(d);bd.acts=bd.acts.filter(x=>x.g!==a.g)}}else{const bd=day(wd);bd.acts=bd.acts.filter(x=>x.id!==id)}})}
 /* ---------- Hijriah ---------- */
 const HM=['Muharram','Safar','Rabiul Awal','Rabiul Akhir','Jumadil Awal','Jumadil Akhir','Rajab','Syaban','Ramadhan','Syawal','Dzulqaidah','Dzulhijjah'];
 const hF=new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'});
@@ -334,12 +341,13 @@ function parseNL(raw,now=new Date()){
  else if(wi>=0){off=(tw-now.getDay()+7)%7;if(off===0&&hh!=null&&hh*60+mm<=now.getHours()*60+now.getMinutes())off=7}
  const hn=HM.map(n=>n.toLowerCase()),gn=MON.map(n=>n.toLowerCase());
  const hr=x.match(new RegExp('\\b(?:tanggal\\s+)?(\\d{1,2})\\s+('+hn.concat(Object.keys(HALIAS)).join('|')+')\\b')),gm=!hr&&x.match(new RegExp('\\b(?:tanggal\\s+)?(\\d{1,2})\\s+('+gn.join('|')+')\\b'));
+ const daily=/\b(?:setiap|tiap)\s+hari\b(?!\s+(?:ahad|minggu|senin|selasa|rabu|kamis|jumat|sabtu))|\bharian\b|\bsehari-hari\b/.test(x);
  let t=x;if(tmTxt)t=t.replace(tmTxt,' ');const dt=hr?hr[0]:gm?gm[0]:'';if(dt)t=t.replace(dt,' ');
  t=t.trim().replace(/^(?:(?:tolong|mohon|bisa)\s+)?(?:(?:buatkan|buatin|buat|bikinkan|bikin|tambahkan|tambah|catatkan|catat|jadwalkan|masukkan|ingatkan|setel|atur)\s*(?:(?:saya|aku|ku)\s+)?)?(?:(?:sebuah|satu)\s+)?(?:(?:kegiatan|acara|agenda|jadwal|pengingat|hitung mundur)\s+)?/,'');
- t=t.replace(/\bhitung mundur\b/g,' ').replace(new RegExp('\\b(?:di\\s+|pada\\s+)?hari\\s+(?:ini|besok|lusa|'+WDR+')\\b','g'),' ');
+ t=t.replace(/\b(?:setiap|tiap)\s+hari\b/g,' ').replace(/\b(?:harian|sehari-hari)\b/g,' ').replace(/\bhitung mundur\b/g,' ').replace(new RegExp('\\b(?:di\\s+|pada\\s+)?hari\\s+(?:ini|besok|lusa|'+WDR+')\\b','g'),' ');
  t=t.replace(new RegExp('(?<!malam\\s)\\b(?:(?:di|pada|setiap|tiap)\\s+)?(?:ahad|senin|selasa|rabu|kamis|jumat|sabtu)\\b','g'),' ').replace(/\b(?:besok|lusa|nanti|setiap|tiap|rutin|mingguan|berulang|tanggal)\b/g,' ').replace(/\s+/g,' ').trim();
  for(let i=0;i<3;i++)t=t.replace(/^(?:di|pada|untuk|dan|yang|ke)\s+/,'').replace(/\s+(?:di|pada|untuk|dan|jam|pukul|ke)$/,'').trim();
- return{title:t?t.charAt(0).toUpperCase()+t.slice(1):'',hh,mm,per,off,wi,tw,weekly:/\b(setiap|tiap|rutin|mingguan|berulang)\b/.test(x),hr,gm,forceCd:/\bhitung mundur\b/.test(x),hasTime:hh!=null}}
+ return{title:t?t.charAt(0).toUpperCase()+t.slice(1):'',hh,mm,per,off,wi,tw,daily,weekly:!daily&&/\b(setiap|tiap|rutin|mingguan|berulang)\b/.test(x),hr,gm,forceCd:/\bhitung mundur\b/.test(x),hasTime:hh!=null}}
 function slotAt(slots,mn){const M=s=>+s.slice(0,2)*60+ +s.slice(3);return slots.find(s=>M(s.s)<=mn&&mn<M(s.e))||slots.slice().sort((a,b)=>Math.abs(M(a.s)-mn)-Math.abs(M(b.s)-mn))[0]}
 function guessCat(title){const x=title.toLowerCase(),g=re=>(CATS.find(c=>re.test(c[0]))||[])[0];
  return(/sekolah|kuliah|kelas|belajar|kampus/.test(x)&&g(/kuliah|sekolah|skripsi|tugas/i))||(/kajian|ngaji|mengaji|tilawah|shalat|sholat|dzikir|liqa|halaqah/.test(x)&&g(/ubudiyah|tilawah|taklim/i))||(/rapat|meeting|kerja|kantor/.test(x)&&g(/meeting|deep|kada|wakepda/i))||(/olahraga|lari|senam|gym/.test(x)&&g(/kesehatan|olahraga|self/i))||g(/pribadi|self/i)||CATS[0][0]}
@@ -351,8 +359,8 @@ function quick(raw){const P=parseNL(raw);if(!P)return;const now=new Date(),tod=y
   return undoable(`Hitung mundur dibuat: ${P.title} · ${mLab(d)}`,()=>{C.list.push({id:'cd-'+uid(),name:P.title.slice(0,80),desc:'',theme:'dynamic',target:d.toISOString(),created:now.toISOString(),done:false});C.auto=true;ensure()})}
  const ds=addD(tod,P.off??0),dw=dow(ds),slots=P.weekly?day(dw).slots:eff(ds).slots;if(!slots.length)return toast('Tambahkan jam dulu, ya.');
  const mn=P.hasTime?P.hh*60+P.mm:({subuh:300,pagi:480,siang:750,sore:960,petang:1000,malam:1170}[P.per]??null),sl=mn!=null?slotAt(slots,mn):slots[0],ts=P.hasTime?` (${p2(P.hh)}.${p2(P.mm)})`:'',c=guessCat(P.title);
- undoable(`Dibuat: ${P.title}${ts} · ${P.weekly?'setiap '+DAYS[dw]:fmtD(ds)}`,()=>{
-  if(P.weekly)day(dw).acts.push({id:'a'+uid(),sl:sl.id,t:P.title+ts,c});
+ undoable(`Dibuat: ${P.title}${ts} · ${P.daily?'setiap hari':P.weekly?'setiap '+DAYS[dw]:fmtD(ds)}`,()=>{
+  if(P.daily)addDaily(P.title+ts,c,sl);else if(P.weekly)day(dw).acts.push({id:'a'+uid(),sl:sl.id,t:P.title+ts,c});
   else Y.carry.push({id:'a'+uid(),t:P.title+ts,c,date:ds,s:sl.s,e:sl.e,l:sl.l});
   Y.date=ds;cat='ALL'})}
 
@@ -457,8 +465,8 @@ const GO={
  cat:c=>{cat=c;rY()},jump:d=>{GO.yv('yj');goDay(d)},reset:()=>undoable('Centang hari ini diulang.',()=>{Y.chk[Y.date]={}}),
  ts:()=>slotForm(),es:id=>slotForm(id),ta:()=>actForm(),as:id=>actForm('',id),ea:id=>actForm(id),
  ds:id=>undoable('Jam dihapus.',()=>{const s=day(dow(Y.date));s.slots=s.slots.filter(x=>x.id!==id);s.acts=s.acts.filter(x=>x.sl!==id)}),
- da:id=>undoable('Kegiatan dihapus.',()=>{if(Y.carry.some(x=>x.id===id))Y.carry=Y.carry.filter(x=>x.id!==id);else{const s=day(dow(Y.date));s.acts=s.acts.filter(x=>x.id!==id)}}),
- fab:()=>DB.tab==='y'?actForm():cdForm(),csv:copyCsv,prof:profSheet,mood:setMood,msv:saveMuh,cloud:cloudSheet,mic:listen,pre:k=>{closeSheet();applyPre(k)},cats:saveCats,hero:()=>{const it=heroItem();if(it)detail(it.id)},cdd:id=>detail(id),cdx:id=>delCD(id),
+ da:id=>{const g=day(dow(Y.date)).acts.find(x=>x.id===id);if(g&&g.g)return delDaily(g);undoable('Kegiatan dihapus.',()=>{if(Y.carry.some(x=>x.id===id))Y.carry=Y.carry.filter(x=>x.id!==id);else{const w=day(dow(Y.date));w.acts=w.acts.filter(x=>x.id!==id)}})},
+ fab:()=>DB.tab==='y'?actForm():cdForm(),csv:copyCsv,prof:profSheet,mood:setMood,msv:saveMuh,cloud:cloudSheet,mic:listen,dd:ddel,pre:k=>{closeSheet();applyPre(k)},cats:saveCats,hero:()=>{const it=heroItem();if(it)detail(it.id)},cdd:id=>detail(id),cdx:id=>delCD(id),
  auto:()=>{C.auto=!C.auto;ensure();save();rCD();toast(C.auto?'Acara paling dekat selalu di atas.':'Mode manual: ketuk acara lalu “Jadikan utama”.')}};
 document.addEventListener('click',e=>{const el=e.target.closest('[data-go]');if(el){e.stopPropagation();const[n,...r]=el.dataset.go.split('|');if(GO[n])GO[n](r.join('|'));return}
  if(e.target.id==='sheet'||e.target.closest('[data-close]'))closeSheet()});
